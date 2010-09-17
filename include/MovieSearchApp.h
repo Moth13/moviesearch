@@ -11,7 +11,7 @@ class MovieSearchApp : public QObject
     Q_OBJECT
 
     public :
-        MovieSearchApp( QObject* _pParent = 0 );
+        MovieSearchApp( QWidget* _pParent = 0 );
 
         ~MovieSearchApp( );
 

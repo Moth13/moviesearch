@@ -3,11 +3,11 @@
 #include <MovieSearchRequest.h>
 
 
-MovieSearchApp::MovieSearchApp( QObject* _pParent )
+MovieSearchApp::MovieSearchApp( QWidget* _pParent )
     :   m_pGUI          ( NULL )
     ,   m_pNetwork      ( NULL )
 {
-    MovieSearchWindow _pGUI( _pParent );
+    m_pGUI = new MovieSearchWindow( _pParent );
     m_pNetwork = new MovieSearchRequest( );
 
 
