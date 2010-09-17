@@ -1,13 +1,10 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2010-09-15T15:45:55
-#
-#-------------------------------------------------
-
 QT       += core gui network
 
 TARGET = MovieSearch
 TEMPLATE = app
+OBJECTS_DIR = ./build
+MOC_DIR = ./build
+DESTDIR = ./out
 DEPENDPATH += . \
     include \
     src

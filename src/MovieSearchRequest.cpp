@@ -4,7 +4,6 @@
 MovieSearchRequest::MovieSearchRequest( )
     :   m_pNetworkAccesManager      ( NULL )
 {
-
     m_pNetworkAccesManager = new QNetworkAccessManager(this);
     QObject::connect(m_pNetworkAccesManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFromNetwork(QNetworkReply* )) );
 }
