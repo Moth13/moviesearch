@@ -46,3 +46,9 @@ MSTabInfo::~MSTabInfo()
 {
     delete ui;
 }
+
+void MSTabInfo::setContent( const QHash< int, QString >& _rhContent )
+{
+
+    ui->TabInfo_Title_Label->setText( _rhContent[ 0 ] );
+}

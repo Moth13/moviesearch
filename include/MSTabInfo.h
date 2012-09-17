@@ -24,7 +24,7 @@
  * MSTabInfo.h
  *
  * Author(s):
- * - Jeremie GUERINEL 
+ * - Jeremie GUERINEL
  *
  * Created 2012-9-17
  */
@@ -40,14 +40,16 @@ namespace Ui {
 
 class MSTabInfo : public QWidget
 {
-    Q_OBJECT
+        Q_OBJECT
 
-public:
-    explicit MSTabInfo(QWidget *parent = 0);
-    ~MSTabInfo();
+    public:
+        explicit MSTabInfo(QWidget *parent = 0);
+        ~MSTabInfo();
 
-private:
-    Ui::MSTabInfo *ui;
+        void setContent( const QHash< int, QString >& _rhContent );
+
+    private:
+        Ui::MSTabInfo *ui;
 };
 
 #endif // MSTABINFO_H

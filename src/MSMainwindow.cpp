@@ -35,12 +35,30 @@
 #include "MSTabInfo.h"
 
 #include <QMessageBox>
+#include <MSParser.h>
 
 MSMainWindow::MSMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MSMainWindow)
 {
     ui->setupUi(this);
+
+    m_pNetworkManager = new QNetworkAccessManager( this );
+
+    bool bIsConnected = QObject::connect( m_pNetworkManager
+                      , SIGNAL( finished( QNetworkReply* ) )
+                      , this
+                      , SLOT( onReplyFinished( QNetworkReply* ) )
+                      , Qt::QueuedConnection );
+
+    if( bIsConnected )
+    {
+        qDebug( "Network manager successfully connected" );
+    }
+    else
+    {
+        qFatal( "Network manager failed to be connected" );
+    }
 }
 
 MSMainWindow::~MSMainWindow()
@@ -59,10 +77,13 @@ void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
 
     if( !strResearch.isEmpty() )
     {
-        MSTabInfo* pTab = new MSTabInfo();
+        QNetworkRequest request;
 
-        ui->lTabInfo_Widget->addTab( pTab, strResearch );
-        m_lpTabsInfo.push_back( pTab );
+//        request.setUrl( QUrl( "http://api.themoviedb.org/3/authentication/token/new?api_key=dc005c14d5fdaa914da77a1855473768" ) );
+
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/search/movie?api_key=dc005c14d5fdaa914da77a1855473768&query=avatar" ) );
+        QNetworkReply* reply = m_pNetworkManager->get( request );
     }
 }
 
@@ -85,4 +106,21 @@ void MSMainWindow::on_actionAbout_MovieSearch_triggered()
     strMessage          += QString( "/n jeremie.guerinel@gmail.com" );
     strMessage          += QString( "/n Version : " ) + QString( MS_VERSION );
     QMessageBox::about( this, "About Movie search", strMessage );
+}
+
+void MSMainWindow::onReplyFinished( QNetworkReply* _pReply )
+{
+    if( _pReply )
+    {
+        qDebug( QString( _pReply->readAll() ).toUtf8().constData() );
+
+        MSParser parser;
+        QHash< int, QString > content = parser.parseContentToResultList( QString( _pReply->readAll() ) );
+
+        MSTabInfo* pTab = new MSTabInfo();
+        pTab->setContent( content );
+
+        ui->lTabInfo_Widget->addTab( pTab, "strResearch" );
+        m_lpTabsInfo.push_back( pTab );
+    }
 }

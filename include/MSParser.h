@@ -21,50 +21,32 @@
  * such intellectual property rights must be express and approved by
  * iFeelSmart in writing.
  *
- * MSMainwindow.h
+ * MSParser.h
  *
  * Author(s):
- * - Jeremie GUERINEL 
+ * - Jeremie GUERINEL
  *
  * Created 2012-9-17
  */
 
-#ifndef MSMAINWINDOW_H
-#define MSMAINWINDOW_H
+#ifndef MSPARSER_H
+#define MSPARSER_H
 
-#include <QMainWindow>
-#include <QtNetwork>
+#include <QtCore>
 
-namespace Ui
+class MSParser
 {
-    class MSMainWindow;
-}
+        friend class MSMainWindow;
 
-class MSTabInfo;
+    public :
+        // JSon to search result list
+        // JSon to movie
+        // JSon to actor
+        QHash< int, QString > parseContentToResultList( const QString& _rstrContent );
 
-class MSMainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    explicit MSMainWindow(QWidget *parent = 0);
-    ~MSMainWindow();
-
-    private slots:
-        void on_SearchFor_TextEdit_returnPressed();
-
-        void on_lTabInfo_Widget_tabCloseRequested(int index);
-
-        void on_actionClose_triggered();
-
-        void on_actionAbout_MovieSearch_triggered();
-
-        void onReplyFinished( QNetworkReply* );
-
-    private:
-        Ui::MSMainWindow *      ui;
-        QList< MSTabInfo* >     m_lpTabsInfo;
-        QNetworkAccessManager * m_pNetworkManager;
+    protected :
+        MSParser();
+        ~MSParser();
 };
 
-#endif // MSMAINWINDOW_H
+#endif // MSPARSER_H
