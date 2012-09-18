@@ -32,7 +32,9 @@
 #ifndef MSTABINFO_H
 #define MSTABINFO_H
 
+#include <QtCore>
 #include <QWidget>
+#include <QtNetwork>
 
 namespace Ui {
     class MSTabInfo;
@@ -47,9 +49,11 @@ class MSTabInfo : public QWidget
         ~MSTabInfo();
 
         void setContent( const QHash< int, QString >& _rhContent );
-
+    private slots :
+        void onReplyFinished( QNetworkReply* );
     private:
         Ui::MSTabInfo *ui;
+        QNetworkAccessManager * m_pNetworkManager;
 };
 
 #endif // MSTABINFO_H

@@ -69,6 +69,8 @@ MSMainWindow::~MSMainWindow()
     {
         delete m_lpTabsInfo.takeLast();
     }
+
+    delete m_pNetworkManager;
 }
 
 void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
@@ -82,7 +84,7 @@ void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
 //        request.setUrl( QUrl( "http://api.themoviedb.org/3/authentication/token/new?api_key=dc005c14d5fdaa914da77a1855473768" ) );
 
         request.setRawHeader( "Accept","application/json" );
-        request.setUrl( QUrl( "http://api.themoviedb.org/3/search/movie?api_key=dc005c14d5fdaa914da77a1855473768&query=avatar" ) );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/search/movie?api_key=dc005c14d5fdaa914da77a1855473768&query=" + strResearch ) );
         QNetworkReply* reply = m_pNetworkManager->get( request );
     }
 }
@@ -115,10 +117,16 @@ void MSMainWindow::onReplyFinished( QNetworkReply* _pReply )
         MSParser parser;
         QHash< int, QString > content = parser.parseContentToResultList( _pReply->readAll() );
 
+        for( int i = 0; i<content.size(); i++ )
+        {
+            ui->History_View->insertItem( i, content[ i ] );
+            ++i;
+        }
+
         MSTabInfo* pTab = new MSTabInfo();
         pTab->setContent( content );
 
-        ui->lTabInfo_Widget->addTab( pTab, "strResearch" );
+        ui->lTabInfo_Widget->addTab( pTab, content[ 0 ] );
         m_lpTabsInfo.push_back( pTab );
     }
 }

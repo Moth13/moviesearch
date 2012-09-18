@@ -34,7 +34,6 @@
 
 #include <QtCore>
 
-
 typedef QPair< QString, QVariant > jsonInfo;
 
 class MSParser

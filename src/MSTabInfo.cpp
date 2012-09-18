@@ -40,15 +40,50 @@ MSTabInfo::MSTabInfo(QWidget *parent) :
 
     ui->TabInfo_Image_Label->setPixmap( QPixmap( "../../../resources/simpson_Me.jpg" ) );
     ui->TabInfo_Title_Label->setText( "J. Guerinel" );
+
+    m_pNetworkManager = new QNetworkAccessManager( this );
+
+    bool bIsConnected = QObject::connect( m_pNetworkManager
+                      , SIGNAL( finished( QNetworkReply* ) )
+                      , this
+                      , SLOT( onReplyFinished( QNetworkReply* ) )
+                      , Qt::QueuedConnection );
+
+    if( bIsConnected )
+    {
+        qDebug( "Network manager successfully connected" );
+    }
+    else
+    {
+        qFatal( "Network manager failed to be connected" );
+    }
 }
 
 MSTabInfo::~MSTabInfo()
 {
     delete ui;
+    delete m_pNetworkManager;
 }
 
 void MSTabInfo::setContent( const QHash< int, QString >& _rhContent )
 {
-
     ui->TabInfo_Title_Label->setText( _rhContent[ 0 ] );
+
+    qDebug() << _rhContent[ 0 ];
+    qDebug() << _rhContent[ 1 ];
+
+    QNetworkRequest request;
+    request.setRawHeader( "Accept","application/json" );
+    request.setUrl( QUrl( _rhContent[ 1 ] ) );
+    QNetworkReply* reply = m_pNetworkManager->get( request );
+}
+
+void MSTabInfo::onReplyFinished( QNetworkReply* _pReply )
+{
+    const QByteArray data( _pReply->readAll() );
+
+    QPixmap pixmap;
+    pixmap.loadFromData(data);
+
+    ui->TabInfo_Image_Label->setPixmap( pixmap );
 }
