@@ -52,9 +52,41 @@ QHash< int, QString > MSParser::parseContentToResultList( const QByteArray& _rst
             ++i;
             hContent.insert( i, QString( "http://cf2.imgobject.com/t/p/w185" ) + result.toMap()[ "poster_path" ].toString() );
             ++i;
+            hContent.insert( i, result.toMap()[ "id" ].toString() );
+            ++i;
 
             qDebug() << result.toMap()[ "original_title" ].toString().toUtf8().constData();
         }
+    }
+    else
+    {
+        qDebug( "parsing failed" );
+    }
+
+    return hContent;
+}
+
+QHash< int, QString > MSParser::parseContentToMovie( const QByteArray& _rstrContent )
+{
+    QHash< int, QString > hContent;
+
+    QJson::Parser parser;
+    bool bOk;
+
+    qDebug() << _rstrContent;
+
+    QVariantMap res = parser.parse( _rstrContent, &bOk ).toMap();
+    if( bOk )
+    {
+        int i = 0;
+        hContent.insert( i, res[ "original_title" ].toString() );
+        ++i;
+        hContent.insert( i, QString( "http://cf2.imgobject.com/t/p/w185" ) + res[ "poster_path" ].toString() );
+        ++i;
+        hContent.insert( i, res[ "tagline" ].toString() );
+        ++i;
+        hContent.insert( i, res[ "overview" ].toString() );
+        ++i;
     }
     else
     {

@@ -17,9 +17,9 @@
    <widget class="QTabWidget" name="lTabInfo_Widget">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>350</x>
       <y>10</y>
-      <width>1081</width>
+      <width>991</width>
       <height>561</height>
      </rect>
     </property>
@@ -37,9 +37,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
-      <width>241</width>
-      <height>451</height>
+      <y>100</y>
+      <width>321</width>
+      <height>471</height>
      </rect>
     </property>
    </widget>
@@ -47,8 +47,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
-      <width>241</width>
+      <y>30</y>
+      <width>321</width>
       <height>31</height>
      </rect>
     </property>
@@ -70,13 +70,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>70</y>
       <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>History :</string>
+     <string>Result : </string>
     </property>
    </widget>
   </widget>

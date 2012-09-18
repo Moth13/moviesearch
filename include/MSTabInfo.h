@@ -48,12 +48,14 @@ class MSTabInfo : public QWidget
         explicit MSTabInfo(QWidget *parent = 0);
         ~MSTabInfo();
 
-        void setContent( const QHash< int, QString >& _rhContent );
+        void searchFor( int iID );
     private slots :
         void onReplyFinished( QNetworkReply* );
     private:
         Ui::MSTabInfo *ui;
         QNetworkAccessManager * m_pNetworkManager;
+        QMap< QNetworkReply*, int > m_pQueriesMap;
+        void setContent( const QHash< int, QString >& _rhContent );
 };
 
 #endif // MSTABINFO_H

@@ -32,7 +32,7 @@
 #ifndef MSMAINWINDOW_H
 #define MSMAINWINDOW_H
 
-#include <QMainWindow>
+#include <QtGui>
 #include <QtNetwork>
 
 namespace Ui
@@ -61,9 +61,12 @@ public:
 
         void onReplyFinished( QNetworkReply* );
 
+        void on_History_View_itemDoubleClicked(QListWidgetItem *item);
+
     private:
         Ui::MSMainWindow *      ui;
         QList< MSTabInfo* >     m_lpTabsInfo;
+        QMap< QString, int >    m_mMovieByID;
         QNetworkAccessManager * m_pNetworkManager;
 };
 

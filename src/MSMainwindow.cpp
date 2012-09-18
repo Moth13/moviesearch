@@ -75,6 +75,8 @@ MSMainWindow::~MSMainWindow()
 
 void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
 {
+    ui->History_View->clear();
+
     QString strResearch = ui->SearchFor_TextEdit->text();
 
     if( !strResearch.isEmpty() )
@@ -87,6 +89,15 @@ void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
         request.setUrl( QUrl( "http://api.themoviedb.org/3/search/movie?api_key=dc005c14d5fdaa914da77a1855473768&query=" + strResearch ) );
         QNetworkReply* reply = m_pNetworkManager->get( request );
     }
+}
+
+void MSMainWindow::on_History_View_itemDoubleClicked(QListWidgetItem *item)
+{
+    MSTabInfo* pTab = new MSTabInfo();
+    pTab->searchFor( m_mMovieByID[ item->text() ] );
+
+    ui->lTabInfo_Widget->addTab( pTab, item->text() );
+    m_lpTabsInfo.push_back( pTab );
 }
 
 void MSMainWindow::on_lTabInfo_Widget_tabCloseRequested(int index)
@@ -120,13 +131,9 @@ void MSMainWindow::onReplyFinished( QNetworkReply* _pReply )
         for( int i = 0; i<content.size(); i++ )
         {
             ui->History_View->insertItem( i, content[ i ] );
+            m_mMovieByID.insert( content[ i ], content[ i + 2 ].toInt() );
+            ++i;
             ++i;
         }
-
-        MSTabInfo* pTab = new MSTabInfo();
-        pTab->setContent( content );
-
-        ui->lTabInfo_Widget->addTab( pTab, content[ 0 ] );
-        m_lpTabsInfo.push_back( pTab );
     }
 }

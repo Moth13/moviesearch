@@ -38,12 +38,10 @@ typedef QPair< QString, QVariant > jsonInfo;
 
 class MSParser
 {
-    friend class MSMainWindow;
-
     public :
         QHash< int, QString > parseContentToResultList( const QByteArray& _rstrContent );
+        QHash< int, QString > parseContentToMovie( const QByteArray& _rstrContent );
 
-    protected :
         MSParser();
         ~MSParser();
 };
