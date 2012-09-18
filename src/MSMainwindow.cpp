@@ -112,10 +112,8 @@ void MSMainWindow::onReplyFinished( QNetworkReply* _pReply )
 {
     if( _pReply )
     {
-        qDebug( QString( _pReply->readAll() ).toUtf8().constData() );
-
         MSParser parser;
-        QHash< int, QString > content = parser.parseContentToResultList( QString( _pReply->readAll() ) );
+        QHash< int, QString > content = parser.parseContentToResultList( _pReply->readAll() );
 
         MSTabInfo* pTab = new MSTabInfo();
         pTab->setContent( content );

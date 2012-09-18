@@ -30,30 +30,31 @@
  */
 
 #include <MSParser.h>
-#include <QScriptEngine>
 
-QHash< int, QString > MSParser::parseContentToResultList( const QString& _rstrContent )
+#include <resources/qjson/include/qjson/parser.h>
+
+QHash< int, QString > MSParser::parseContentToResultList( const QByteArray& _rstrContent )
 {
     QHash< int, QString > hContent;
 
-//    QScriptValue sc;
-//    QScriptEngine engine;
-//    sc = engine.evaluate( QString( m_ByteArray ) ); // In new versions it may need to look like engine.evaluate("(" + QString(result) + ")");
+    QJson::Parser parser;
+    bool bOk;
 
-//    qDebug( sc.toString().toUtf8().constData() );
-//    if( sc.property("results").isArray())
-//    {
-//        qDebug( "azezaeazZ" );
-//        QStringList items;
-//        qScriptValueToSequence( sc.property("results"), items );
+    qDebug() << _rstrContent;
 
-//        for( int i = 0; i<items.size(); ++i )
-//        {
-//            qDebug("value %s",items[ i ].toStdString().c_str() );
-//            hContent.insert( i, items[ i ] );
-//        }
+    QVariantMap res = parser.parse( _rstrContent, &bOk ).toMap();
+    if( bOk )
+    {
+        foreach( QVariant result, res[ "results" ].toList() )
+        {
+            qDebug() << result.toMap()[ "original_title" ].toString().toUtf8().constData();
+        }
+    }
+    else
+    {
+        qDebug( "parsing failed" );
+    }
 
-//    }
     return hContent;
 
 //    result to parse :

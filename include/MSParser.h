@@ -34,15 +34,15 @@
 
 #include <QtCore>
 
+
+typedef QPair< QString, QVariant > jsonInfo;
+
 class MSParser
 {
-        friend class MSMainWindow;
+    friend class MSMainWindow;
 
     public :
-        // JSon to search result list
-        // JSon to movie
-        // JSon to actor
-        QHash< int, QString > parseContentToResultList( const QString& _rstrContent );
+        QHash< int, QString > parseContentToResultList( const QByteArray& _rstrContent );
 
     protected :
         MSParser();
