@@ -32,7 +32,8 @@ LIBS        += -L../../../resources/qjson/lib -lqjson
 
 HEADERS     +=  include/MSMainwindow.h \
                 include/MSTabInfo.h \
-                include/MSParser.h
+                include/MSParser.h \
+    include/MSData.h
 
 SOURCES     +=  src/main.cpp \
                 src/MSTabInfo.cpp \
@@ -41,6 +42,7 @@ SOURCES     +=  src/main.cpp \
 
 FORMS       +=  resources/MSMainwindow.ui \
                 resources/MSTabInfo.ui
+
 
 
 

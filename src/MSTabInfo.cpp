@@ -1,26 +1,4 @@
-/* iFeelSmart CONFIDENTIAL
- *
- * Copyright © 2012, iFeelSmart.
- * All Rights Reserved.
- *
- * The source code contained or described herein and all documents
- * related to the source code ("Material") are owned by iFeelSmart
- * or its suppliers or licensors. Title to the Material remains
- * with iFeelSmart or its suppliers and licensors.
- * The Material contains trade secrets, proprietary code and confidential
- * information of iFeelSmart or its suppliers and licensors. The Material is
- * protected by worldwide copyright and trade secret laws and treaty
- * provisions. No part of the Material may be used, copied, reproduced,
- * modified, published, uploaded, posted, transmitted, distributed, or
- * disclosed in any way without iFeelSmart's prior express written permission.
- *
- * No license under any patent, copyright, trade secret or other
- * intellectual property right is granted to or conferred upon you by
- * disclosure or delivery of the Materials, either expressly, by
- * implication, inducement, estoppel or otherwise. Any license under
- * such intellectual property rights must be express and approved by
- * iFeelSmart in writing.
- *
+/*
  * MSTabInfo.cpp
  *
  * Author(s):
@@ -33,14 +11,14 @@
 #include "ui_MSTabInfo.h"
 #include <MSParser.h>
 
-MSTabInfo::MSTabInfo(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::MSTabInfo)
-{
-    ui->setupUi(this);
+#include <MSData.h>
 
-    ui->TabInfo_Image_Label->setPixmap( QPixmap( "../../../resources/simpson_Me.jpg" ) );
-    ui->TabInfo_Title_Label->setText( "J. Guerinel" );
+MSTabInfo::MSTabInfo( QWidget* _pParent )
+    :   QWidget     ( _pParent )
+    ,   m_pUI       ( new Ui::MSTabInfo )
+    ,   m_pData     ( NULL )
+{
+    m_pUI->setupUi( this );
 
     m_pNetworkManager = new QNetworkAccessManager( this );
 
@@ -62,28 +40,77 @@ MSTabInfo::MSTabInfo(QWidget *parent) :
 
 MSTabInfo::~MSTabInfo()
 {
-    delete ui;
+    delete m_pUI;
     delete m_pNetworkManager;
+
+    if( m_pData )
+    {
+        delete m_pData;
+        m_pData = NULL;
+    }
 }
 
 void MSTabInfo::searchFor( int iID )
 {
+    qDebug( "searchFor" );
+
     QNetworkRequest request;
     request.setRawHeader( "Accept","application/json" );
     request.setUrl( QUrl( "http://api.themoviedb.org/3/movie/" + QString::number( iID ) + "?api_key=dc005c14d5fdaa914da77a1855473768" ) );
     m_pQueriesMap.insert( m_pNetworkManager->get( request ), 0 );
 }
 
-void MSTabInfo::setContent( const QHash< int, QString >& _rhContent )
+bool MSTabInfo::hasData() const
 {
-    ui->TabInfo_Title_Label->setText( _rhContent[ 0 ] );
-    ui->TabInfo_TagLine_Label->setText( _rhContent[ 2 ] );
-    ui->TabInfo_Overview_Label->setText( _rhContent[ 3 ] );
+    return m_pData != NULL ;
+}
 
-    QNetworkRequest request;
-    request.setRawHeader( "Accept","application/json" );
-    request.setUrl( QUrl( _rhContent[ 1 ] ) );
-    m_pQueriesMap.insert( m_pNetworkManager->get( request ), 1 );
+const MSData& MSTabInfo::getCurrentData() const
+{
+    Q_ASSERT( m_pData );
+
+    return *m_pData;
+}
+
+void MSTabInfo::setContent( const MSData& rMSData )
+{
+    if( m_pData )
+    {
+        delete m_pData;
+        m_pData = NULL;
+    }
+    m_pData = &const_cast< MSData& >( rMSData );
+
+    qDebug( "setContent" );
+
+    if( rMSData.getType() == "MSMovieInfo")
+    {
+        qDebug() <<"rMSData is a MSMovie";
+
+        const MSMovieInfo& rMovie = static_cast< const MSMovieInfo& >( rMSData );
+        m_pUI->TabInfo_Title_Label->setText( rMovie.getTitle() );
+        m_pUI->TabInfo_Tagline_Label->setText(rMovie.getTagline() );
+        m_pUI->TabInfo_Overview_Label->setText( rMovie.getOverview() );
+        m_pUI->TabInfo_ReleaseDate_Label->setText( rMovie.getReleaseDate().toString() );
+//        m_pUI->TabInfo_OriTitle_Label->setText( rMovie.getOrignalTitle() );
+        m_pUI->TabInfo_VoteAverage_Label->setText( QString::number( rMovie.getVoteAverage() ) );
+        m_pUI->TabInfo_VoteCount_Label->setText( QString::number( rMovie.getVoteCount() ) );
+        m_pUI->TabInfo_Homepage_Label->setText( rMovie.getHomepage().toString() );
+
+        QNetworkRequest request;
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( QString( "http://cf2.imgobject.com/t/p/w185/" ) + rMovie.getPosterPath() ) );
+        m_pQueriesMap.insert( m_pNetworkManager->get( request ), 1 );
+    }
+    if( rMSData.getType() == "MSPersonInfo")
+    {
+        qWarning( "Not yet implemented" );
+    }
+    if( rMSData.getType() == "MSData")
+    {
+        qFatal( "MSData can't be handled!!" );
+    }
+
 }
 
 void MSTabInfo::onReplyFinished( QNetworkReply* _pReply )
@@ -96,12 +123,16 @@ void MSTabInfo::onReplyFinished( QNetworkReply* _pReply )
         QPixmap pixmap;
         pixmap.loadFromData(data);
 
-        ui->TabInfo_Image_Label->setPixmap( pixmap );
+        m_pUI->TabInfo_Image_Label->setPixmap( pixmap );
     }
     else
     {
         MSParser parser;
-        QHash< int, QString > content = parser.parseContentToMovie( _pReply->readAll() );
-        setContent( content );
+        MSMovieInfo* pMovie = parser.parseContentToMovie( _pReply->readAll() );
+
+        if( pMovie )
+        {
+            setContent( *pMovie );
+        }
     }
 }
