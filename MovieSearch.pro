@@ -28,12 +28,14 @@ INCLUDEPATH += include
 INCLUDEPATH += resources/qjson/include
 
 #To be changed
-LIBS        += -L../../../resources/qjson/lib -lqjson
+LIBS        += -L$$PWD/resources/qjson/lib -lqjson
+
+DEPENDPATH  += $$PWD/resources/qjson/lib
 
 HEADERS     +=  include/MSMainwindow.h \
                 include/MSTabInfo.h \
                 include/MSParser.h \
-    include/MSData.h
+                include/MSData.h
 
 SOURCES     +=  src/main.cpp \
                 src/MSTabInfo.cpp \

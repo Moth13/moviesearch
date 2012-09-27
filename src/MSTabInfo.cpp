@@ -86,6 +86,7 @@ void MSTabInfo::setContent( const MSData& rMSData )
     if( rMSData.getType() == "MSMovieInfo")
     {
         qDebug() <<"rMSData is a MSMovie";
+        qDebug() << rMSData.toString();
 
         const MSMovieInfo& rMovie = static_cast< const MSMovieInfo& >( rMSData );
         m_pUI->TabInfo_Title_Label->setText( rMovie.getTitle() );
