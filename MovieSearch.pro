@@ -28,19 +28,25 @@ INCLUDEPATH += include
 INCLUDEPATH += resources/qjson/include
 
 #To be changed
-LIBS        += -L$$PWD/resources/qjson/lib -lqjson
+unix:LIBS   += -L$$PWD/resources/qjson/lib -lqjson
+win32:LIBS  += -L$$PWD/resources/qjson/lib -lqjson0
 
 DEPENDPATH  += $$PWD/resources/qjson/lib
 
-HEADERS     +=  include/MSMainwindow.h \
+HEADERS     +=  \
                 include/MSTabInfo.h \
-                include/MSParser.h \
-                include/MSData.h
+                include/MSData.h \
+    include/MSData_TMDB.h \
+    include/MSSearchEngine_TMDB.h \
+    include/MSSearchEngine.h \
+    include/MSTools.h \
+    include/MSMainWindow.h
 
 SOURCES     +=  src/main.cpp \
                 src/MSTabInfo.cpp \
-                src/MSMainwindow.cpp \
-                src/MSParser.cpp
+    src/MSSearchEngine.cpp \
+    src/MSSearchEngine_TMDB.cpp \
+    src/MSMainWindow.cpp
 
 FORMS       +=  resources/MSMainwindow.ui \
                 resources/MSTabInfo.ui

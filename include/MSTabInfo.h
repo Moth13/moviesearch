@@ -19,10 +19,15 @@ namespace Ui
     class MSTabInfo;
 }
 
-class MSData;
-
-class MSTabInfo : public QWidget
+namespace Data
 {
+    class MSData;
+}
+
+namespace UI
+{
+    class MSTabInfo : public QWidget
+    {
         Q_OBJECT
 
     public:
@@ -32,7 +37,7 @@ class MSTabInfo : public QWidget
         void searchFor( int iID );
 
         bool hasData() const;
-        const MSData& getCurrentData() const;
+        const Data::MSData& getCurrentData() const;
 
     private slots :
         void onReplyFinished( QNetworkReply* );
@@ -41,9 +46,9 @@ class MSTabInfo : public QWidget
         Ui::MSTabInfo*              m_pUI;
         QNetworkAccessManager*      m_pNetworkManager;
         QMap< QNetworkReply*, int > m_pQueriesMap;
-        MSData*                     m_pData;
+        Data::MSData*               m_pData;
 
-        void setContent( const MSData& rMSData );
-};
-
+        void setContent( const Data::MSData& rMSData );
+    };
+}
 #endif // MSTABINFO_H

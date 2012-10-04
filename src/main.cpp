@@ -8,12 +8,16 @@
  */
 
 #include <QtGui/QApplication>
-#include "MSMainwindow.h"
+#include <MSMainWindow.h>
+
+#include <MSSearchEngine.h>
 
 int main(int argc, char *argv[])
 {
+    Tools::MSSearchEngineManager::loadAllSearchEngines();
+
     QApplication a(argc, argv);
-    MSMainWindow w;
+    UI::MSMainWindow w;
     w.show();
 
     return a.exec();
