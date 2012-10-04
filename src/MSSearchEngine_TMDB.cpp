@@ -46,6 +46,7 @@ namespace Tools
 
         request.setRawHeader( "Accept","application/json" );
         request.setUrl( QUrl( "http://api.themoviedb.org/3/search/movie?api_key=dc005c14d5fdaa914da77a1855473768&query=" + _rstrTitle ) );
+
         pReply = m_pNetworkManager->get( request );
 
         uint uiQueryId = qHash( _rstrTitle );

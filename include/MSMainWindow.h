@@ -49,7 +49,7 @@ namespace UI
         QList< MSTabInfo* >             m_lpTabsInfo;               ///< Opened tabs
 
         Tools::MSSearchEngine*          m_xpCurrentSearchEngine;    ///< Current search engine
-        QList< Data::MSData* >          m_lpDataSearchResult;       ///< Search result
+        QMap< QString, Data::MSData* >  m_lpDataSearchResult;       ///< Search result
 
         uint                            m_uiLastQueryID;
 
@@ -77,9 +77,8 @@ namespace UI
         void on_actionClose_triggered();
 
         void on_actionAbout_MovieSearch_triggered();
-
-        void on_History_View_itemDoubleClicked(QListWidgetItem *item);
         //------------------------------------------------------//
+        void on_SearchFor_TextEdit_textEdited(const QString &arg1);
     };
 }
 

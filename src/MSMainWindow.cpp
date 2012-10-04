@@ -27,7 +27,13 @@ namespace UI
     {
         m_pUI->setupUi( this );
 
-        connectToSearchEngine( Tools::MSSearchEngineManager::getAllSearchEngine()[ 0 ]);
+        connectToSearchEngine( Tools::MSSearchEngineManager::getAllSearchEngine()[ 0 ] );
+
+        QStandardItemModel *model = new QStandardItemModel();
+        m_pUI->SearchFor_TextEdit->setCompleter( new QCompleter(model, this) );
+        m_pUI->SearchFor_TextEdit->installEventFilter( this );
+        m_pUI->SearchFor_TextEdit->completer()->setCompletionMode( QCompleter::UnfilteredPopupCompletion );
+        m_pUI->SearchFor_TextEdit->completer()->setCaseSensitivity( Qt::CaseInsensitive );
     }
 
     MSMainWindow::~MSMainWindow()
@@ -56,24 +62,29 @@ namespace UI
     {
         if( m_uiLastQueryID == _uiQueryID )
         {
-//            SAFE_LIST_DELETE( m_lpDataSearchResult );
             m_lpDataSearchResult.clear();
-            m_pUI->History_View->clear();
 
-            Data::MSMovieSearchResult* pData = NULL;
-            for( int i = 0; i<_lpResults.size(); ++i )
+            QStandardItemModel *model = (QStandardItemModel*)(m_pUI->SearchFor_TextEdit->completer()->model());
+            model->setRowCount( _lpResults.size() );
+            model->setColumnCount( 1 );
+
+            for( int i = 0; i<_lpResults.size(); i++ )
             {
-                pData = _lpResults[ i ];
-                m_pUI->History_View->insertItem( i, pData->getName() );
-                m_lpDataSearchResult.push_back( pData );
-            }
+                m_lpDataSearchResult.insert( _lpResults[ i ]->getName(), _lpResults[ i ] );
+                QStandardItem* item = new QStandardItem( _lpResults[ i ]->getName() );
+                item->setText( _lpResults[ i ]->getName() );
+                item->setIcon( QIcon( "../../../resources/simpson_Me.jpg" ) );
+    //            item->setSizeHint( QSize(192,98) );
+                model->setItem( i, 0, item );
 
-            m_uiLastQueryID = -1;
+                ++i;
+            }
         }
     }
 
     void MSMainWindow::onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie )
     {
+        qDebug() << "onMovieBasicInfoFound";
         if( m_uiLastQueryID == _uiQueryID )
         {
             MSTabInfo* pTab = new MSTabInfo();
@@ -86,11 +97,12 @@ namespace UI
 
     void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
     {
+        qDebug() << "on_SearchFor_TextEdit_returnPressed";
+
         if( NULL != m_xpCurrentSearchEngine )
         {
-            m_pUI->History_View->clear();
             QString strResearch     = m_pUI->SearchFor_TextEdit->text();
-            m_uiLastQueryID          = m_xpCurrentSearchEngine->getMoviesFromTitle( strResearch );
+            m_uiLastQueryID         = m_xpCurrentSearchEngine->getBasicMovieInfo( *static_cast< Data::MSMovieSearchResult* > ( m_lpDataSearchResult[ strResearch ] ) );
         }
         else
         {
@@ -98,12 +110,6 @@ namespace UI
                                   , QObject::tr( "Error" )
                                   , QObject::tr( "Please selecte a search engine." ) );
         }
-    }
-
-    void MSMainWindow::on_History_View_itemDoubleClicked(QListWidgetItem *item)
-    {
-//        pTab->searchFor( m_mMovieByID[ item->text() ] );
-
     }
 
     void MSMainWindow::on_lTabInfo_Widget_tabCloseRequested(int index)
@@ -125,5 +131,24 @@ namespace UI
         strMessage          += QString( "/n jeremie.guerinel@gmail.com" );
         strMessage          += QString( "/n Version : " );// + QString::number( MS_VERSION );
         QMessageBox::about( this, "About Movie search", strMessage );
+    }
+
+    void MSMainWindow::on_SearchFor_TextEdit_textEdited( const QString &arg1 )
+    {
+        if( NULL != m_xpCurrentSearchEngine )
+        {
+            QString strResearch = m_pUI->SearchFor_TextEdit->text();
+
+            if( !strResearch.isEmpty() )
+            {
+                m_uiLastQueryID         = m_xpCurrentSearchEngine->getMoviesFromTitle( strResearch );
+            }
+        }
+        else
+        {
+            QMessageBox::warning( this
+                                  , QObject::tr( "Error" )
+                                  , QObject::tr( "Please selecte a search engine." ) );
+        }
     }
 }

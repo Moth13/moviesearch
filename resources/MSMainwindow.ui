@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1325</width>
-    <height>721</height>
+    <height>686</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,10 +29,10 @@
    <widget class="QTabWidget" name="lTabInfo_Widget">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>10</y>
-      <width>961</width>
-      <height>591</height>
+      <x>10</x>
+      <y>100</y>
+      <width>1301</width>
+      <height>501</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -51,28 +51,12 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QListWidget" name="History_View">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>321</width>
-      <height>291</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="SearchFor_TextEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
-      <width>321</width>
+      <y>50</y>
+      <width>681</width>
       <height>31</height>
      </rect>
     </property>
@@ -102,23 +86,53 @@
      <string>Search for : </string>
     </property>
    </widget>
-   <widget class="QLabel" name="History_Label">
+   <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>101</width>
+      <x>890</x>
+      <y>50</y>
+      <width>421</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>20</y>
+      <width>171</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
+    <property name="text">
+     <string>Available search engine : </string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>112</width>
+      <height>26</height>
+     </rect>
     </property>
     <property name="text">
-     <string>Result : </string>
+     <string>Movie</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_2">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>112</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Person</string>
     </property>
    </widget>
   </widget>

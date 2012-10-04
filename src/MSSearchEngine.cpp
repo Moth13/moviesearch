@@ -26,6 +26,12 @@ namespace Tools
                               , _xpMainWindow
                               , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                              , _xpMainWindow
+                              , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                              , Qt::UniqueConnection );
         }
     }
 
@@ -42,6 +48,11 @@ namespace Tools
                               , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , _xpMainWindow
                               , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                              , _xpMainWindow
+                              , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) ) );
         }
     }
 
