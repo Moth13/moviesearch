@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="TabInfo_Image_Label">
+  <widget class="MSImage" name="TabInfo_Image_Label">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -34,8 +34,17 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="frameShape">
+    <enum>QFrame::Panel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Sunken</enum>
+   </property>
    <property name="text">
     <string/>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -276,6 +285,13 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MSImage</class>
+   <extends>QLabel</extends>
+   <header>MSImage.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

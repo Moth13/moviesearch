@@ -51,7 +51,7 @@ namespace UI
             QList< MSTabInfo* >             m_lpTabsInfo;               ///< Opened tabs
 
             Tools::MSSearchEngine*          m_xpCurrentSearchEngine;    ///< Current search engine
-            QMap< QString, Data::MSData* >  m_lpDataSearchResult;       ///< Search result
+            QMap< QString, Data::MSData* >  m_mDataSearchResult;       ///< Search result
 
             uint                            m_uiLastQueryID;
 

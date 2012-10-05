@@ -42,16 +42,20 @@ HEADERS     +=  \
     include/MSTools.h \
     include/MSMainWindow.h \
     include/MSDataMovie.h \
-    include/MSDataPersonn.h
+    include/MSDataPersonn.h \
+    include/MSImage.h
 
 SOURCES     +=  src/main.cpp \
                 src/MSTabInfo.cpp \
     src/MSSearchEngine.cpp \
     src/MSSearchEngine_TMDB.cpp \
-    src/MSMainWindow.cpp
+    src/MSMainWindow.cpp \
+    src/MSImage.cpp
 
 FORMS       +=  resources/MSMainwindow.ui \
                 resources/MSTabInfo.ui
+
+
 
 
 

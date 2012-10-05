@@ -70,10 +70,10 @@ namespace UI
 
     void MSMainWindow::cleanResults()
     {
-        QStringList lstrKeys = m_lpDataSearchResult.keys();
+        QStringList lstrKeys = m_mDataSearchResult.keys();
         foreach( QString strKey, lstrKeys )
         {
-            delete m_lpDataSearchResult.take( strKey );
+            delete m_mDataSearchResult.take( strKey );
         }
     }
 
@@ -83,14 +83,13 @@ namespace UI
         {
             m_pUI->statusBar->showMessage( QObject::tr( "Results found!!" ) );
             cleanResults();
-//            m_pCompleterModel->clear();
 
             m_pCompleterModel->setRowCount( _lpResults.size() );
             m_pCompleterModel->setColumnCount( 1 );
 
             for( int i = 0; i<_lpResults.size(); i++ )
             {
-                m_lpDataSearchResult.insert( _lpResults[ i ]->getName(), _lpResults[ i ] );
+                m_mDataSearchResult.insert( _lpResults[ i ]->getName(), _lpResults[ i ] );
 
                 QStandardItem* pItem = new QStandardItem( "" );
                 pItem->setText( _lpResults[ i ]->getName() );
@@ -103,10 +102,10 @@ namespace UI
 
     void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
     {
-        qDebug() << "on_SearchFor_TextEdit_returnPressed";
-        if( NULL != m_xpCurrentSearchEngine )
+        QString strResearch         = m_pUI->SearchFor_TextEdit->text();
+        if( NULL != m_xpCurrentSearchEngine
+            && m_mDataSearchResult.contains( strResearch ) )
         {
-            QString strResearch     = m_pUI->SearchFor_TextEdit->text();
             MSTabInfo* pTab         = new MSTabInfo();
 
             m_xpCurrentSearchEngine->doConnection( pTab );
@@ -115,27 +114,35 @@ namespace UI
             m_pUI->lTabInfo_Widget->setCurrentIndex( m_lpTabsInfo.size() );
             m_lpTabsInfo.push_back( pTab );
 
-            m_uiLastQueryID         = m_xpCurrentSearchEngine->getBasicMovieInfo( *static_cast< Data::MSMovieSearchResult* > ( m_lpDataSearchResult[ strResearch ] ) );
+            uint uiQueryID          = m_xpCurrentSearchEngine->getBasicMovieInfo( *static_cast< Data::MSMovieSearchResult* > ( m_mDataSearchResult[ strResearch ] ) );
+            pTab->setQueryID( uiQueryID );
+
+            m_mDataSearchResult.clear();
         }
         else
         {
+            QString strErrorMsg = "";
+
+            if( NULL == m_xpCurrentSearchEngine )
+            {
+                strErrorMsg = QObject::tr( "Please selecte a search engine." );
+            }
+
+            if( !m_mDataSearchResult.contains( strResearch ) )
+            {
+                strErrorMsg = QObject::tr( "No movie/personn found with this entry : " ) + strResearch;
+            }
+
             QMessageBox::warning( this
                                   , QObject::tr( "Error" )
-                                  , QObject::tr( "Please selecte a search engine." ) );
+                                  , strErrorMsg );
         }
     }
 
     void MSMainWindow::on_lTabInfo_Widget_tabCloseRequested(int index)
     {
-        qDebug() << "on_lTabInfo_Widget_tabCloseRequested";
-
         MSTabInfo* pTab = m_lpTabsInfo.takeAt( index );
         m_pUI->lTabInfo_Widget->removeTab( index );
-
-        if( NULL != m_xpCurrentSearchEngine )
-        {
-            m_xpCurrentSearchEngine->doDisconnection( pTab );
-        }
 
         delete pTab;
     }

@@ -12,11 +12,17 @@
 
 #include <QtCore>
 #include <QWidget>
-#include <QMovie>
+
+class MSImage;
 
 namespace Ui
 {
     class MSTabInfo;
+}
+
+namespace Tools
+{
+    class MSSearchEngine;
 }
 
 namespace Data
@@ -42,13 +48,21 @@ namespace UI
             bool hasData() const;
             /*! \return Current screen data */
             const Data::MSData& getCurrentData() const;
+            /*! Set associate queryID */
+            void setQueryID( uint _uiQueryID );
+            /*! Set search engine */
+            void setSearchEngine( Tools::MSSearchEngine* _xpSearchEngine = NULL );
             //------------------------------------------------------//
 
         private:
+            //------------------------------------------------------//
+            // Attributs
             Ui::MSTabInfo*              m_pUI;
             Data::MSData*               m_pData;
-
-            QMovie*                     m_pWaitingAnimation;
+            Tools::MSSearchEngine*      m_xpSearchEngine;
+            uint                        m_uiDataQueryID;
+            QMap< uint, MSImage* >      m_mQueryImage;
+            //------------------------------------------------------//
 
             //------------------------------------------------------//
             // Tools
@@ -58,6 +72,8 @@ namespace UI
         private slots :
             /*! sigMoviesFromTitleFound handler slot */
             void onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
+            /*! sigImageFound handler slot */
+            void onImageFound( uint _uiQueryID, QPixmap* _pPixmap );
     };
 }
 #endif // MSTABINFO_H

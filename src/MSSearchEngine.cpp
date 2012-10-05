@@ -37,10 +37,18 @@ namespace Tools
     {
         if( NULL != _xpTabInfo )
         {
+            _xpTabInfo->setSearchEngine( this );
+
             QObject::connect( this
                               , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , _xpTabInfo
                               , SLOT( onMovieBasicInfoFound( uint,Data::MSMovieInfo* ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                              , _xpTabInfo
+                              , SLOT( onImageFound( uint, QPixmap* ) )
                               , Qt::UniqueConnection );
         }
     }
@@ -64,6 +72,13 @@ namespace Tools
                               , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , _xpTabInfo
                               , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                              , _xpTabInfo
+                              , SLOT( onImageFound( uint, QPixmap* ) ) );
+
+            _xpTabInfo->setSearchEngine( NULL );
         }
     }
 

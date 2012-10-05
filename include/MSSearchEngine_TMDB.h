@@ -26,6 +26,11 @@ namespace Tools
             \return a queryId
         */
         virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult );
+        /*!
+            Get basic information from a MSMMovieSearchResult
+            \return a queryId
+        */
+        virtual uint getImage( const QString& _rstrImageName, eImageType _eImageType );
         //------------------------------------------------------//
     protected :
         /*! Constructor */

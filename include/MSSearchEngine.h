@@ -33,6 +33,14 @@ namespace Tools
         Q_OBJECT
         friend class MSSearchEngineManager;
     public :
+        /*! \enum Image type*/
+        enum eImageType
+        {   ICON    = 0
+        ,   POSTER
+        ,   MAX
+        };
+//        typedef uint eImageType;
+
         //------------------------------------------------------//
         // Attributs functions
         /*! \return Search Engine's name */
@@ -53,6 +61,11 @@ namespace Tools
         //------------------------------------------------------//
         // Search functions
         /*!
+            Get basic information from a MSMMovieSearchResult
+            \return a queryId
+        */
+        virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult ) = 0;
+        /*!
             Get all movie from a title
             \return aqueryId
         */
@@ -61,7 +74,7 @@ namespace Tools
             Get basic information from a MSMMovieSearchResult
             \return a queryId
         */
-        virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult ) = 0;
+        virtual uint getImage( const QString& _rstrImageName, eImageType _eImageType ) = 0;
         //------------------------------------------------------//
 
     signals :
@@ -69,8 +82,10 @@ namespace Tools
         // Signals
         /*! Signal emitted when get movies from title is completed */
         void sigMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults );
-        /*! Signal emitted when get basic moovie info is completed */
+        /*! Signal emitted when get basic movie info is completed */
         void sigMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
+        /*! Signal emitted when get image is completed */
+        void sigImageFound( uint _uiQueryID, QPixmap* _pPixmap );
         //------------------------------------------------------//
 
     protected :
