@@ -1,7 +1,11 @@
 #include <MSSearchEngine.h>
 
-#include <MSData.h>
+#include <MSDataMovie.h>
+#include <MSDataPersonn.h>
+
 #include <MSMainWindow.h>
+#include <MSTabInfo.h>
+
 #include <MSSearchEngine_TMDB.h>
 
 namespace Tools
@@ -22,12 +26,6 @@ namespace Tools
         if( NULL != _xpMainWindow )
         {
             QObject::connect( this
-                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
-                              , _xpMainWindow
-                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
                               , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
                               , _xpMainWindow
                               , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
@@ -37,18 +35,20 @@ namespace Tools
 
     void MSSearchEngine::doConnection( UI::MSTabInfo* _xpTabInfo )
     {
-
+        if( NULL != _xpTabInfo )
+        {
+            QObject::connect( this
+                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
+                              , _xpTabInfo
+                              , SLOT( onMovieBasicInfoFound( uint,Data::MSMovieInfo* ) )
+                              , Qt::UniqueConnection );
+        }
     }
 
     void MSSearchEngine::doDisconnection( UI::MSMainWindow* _xpMainWindow )
     {
         if( NULL != _xpMainWindow )
         {
-            QObject::disconnect( this
-                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
-                              , _xpMainWindow
-                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
-
             QObject::disconnect( this
                               , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
                               , _xpMainWindow
@@ -58,7 +58,13 @@ namespace Tools
 
     void MSSearchEngine::doDisconnection( UI::MSTabInfo* _xpTabInfo )
     {
-
+        if( NULL != _xpTabInfo )
+        {
+            QObject::disconnect( this
+                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
+                              , _xpTabInfo
+                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
+        }
     }
 
     QList< MSSearchEngine* > MSSearchEngineManager::s_lpSearchEngine = QList< MSSearchEngine* >();

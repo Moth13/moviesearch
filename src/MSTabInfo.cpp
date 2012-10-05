@@ -7,59 +7,42 @@
  * Created 2012-9-17
  */
 
-#include "include/MSTabInfo.h"
-#include "ui_MSTabInfo.h"
-#include <MSSearchEngine.h>
+#include <include/MSTabInfo.h>
+#include <ui_MSTabInfo.h>
 
-#include <MSData.h>
+#include <MSDataMovie.h>
+#include <MSDataPersonn.h>
+
+#include <MSSearchEngine.h>
 
 namespace UI
 {
     MSTabInfo::MSTabInfo( QWidget* _pParent )
-        :   QWidget     ( _pParent )
-        ,   m_pUI       ( new Ui::MSTabInfo )
-        ,   m_pData     ( NULL )
+        :   QWidget             ( _pParent )
+        ,   m_pUI               ( new Ui::MSTabInfo )
+        ,   m_pData             ( NULL )
+        ,   m_pWaitingAnimation ( NULL )
     {
         m_pUI->setupUi( this );
 
-        m_pNetworkManager = new QNetworkAccessManager( this );
-
-        bool bIsConnected = QObject::connect( m_pNetworkManager
-                                              , SIGNAL( finished( QNetworkReply* ) )
-                                              , this
-                                              , SLOT( onReplyFinished( QNetworkReply* ) )
-                                              , Qt::QueuedConnection );
-
-        if( bIsConnected )
-        {
-            qDebug( "Network manager successfully connected" );
-        }
-        else
-        {
-            qFatal( "Network manager failed to be connected" );
-        }
+        m_pWaitingAnimation = new QMovie( "../../../resources/waiting.gif" );
+        m_pUI->TabInfo_Image_Label->setMovie( m_pWaitingAnimation );
+        m_pUI->TabInfo_Image_Label->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+        m_pWaitingAnimation->start();
     }
 
     MSTabInfo::~MSTabInfo()
     {
-        delete m_pUI;
-        delete m_pNetworkManager;
+        m_pWaitingAnimation->stop();
+        delete m_pWaitingAnimation;
 
         if( m_pData )
         {
             delete m_pData;
             m_pData = NULL;
         }
-    }
 
-    void MSTabInfo::searchFor( int iID )
-    {
-        qDebug( "searchFor" );
-
-        QNetworkRequest request;
-        request.setRawHeader( "Accept","application/json" );
-        request.setUrl( QUrl( "http://api.themoviedb.org/3/movie/" + QString::number( iID ) + "?api_key=dc005c14d5fdaa914da77a1855473768" ) );
-        m_pQueriesMap.insert( m_pNetworkManager->get( request ), 0 );
+        delete m_pUI;
     }
 
     bool MSTabInfo::hasData() const
@@ -103,10 +86,10 @@ namespace UI
             m_pUI->TabInfo_VoteCount_Label->setText( QString::number( rMovie.getVoteCount() ) );
             m_pUI->TabInfo_Homepage_Label->setText( rMovie.getHomepage().toString() );
 
-            QNetworkRequest request;
-            request.setRawHeader( "Accept","application/json" );
-            request.setUrl( QUrl( QString( "http://cf2.imgobject.com/t/p/w185/" ) + rMovie.getPosterPath() ) );
-            m_pQueriesMap.insert( m_pNetworkManager->get( request ), 1 );
+//            QNetworkRequest request;
+//            request.setRawHeader( "Accept","application/json" );
+//            request.setUrl( QUrl( QString( "http://cf2.imgobject.com/t/p/w185/" ) + rMovie.getPosterPath() ) );
+//            m_pQueriesMap.insert( m_pNetworkManager->get( request ), 1 );
         }
         if( rMSData.getType().contains( "MSPersonInfo" ) )
         {
@@ -121,27 +104,35 @@ namespace UI
         }
     }
 
-    void MSTabInfo::onReplyFinished( QNetworkReply* _pReply )
+    void MSTabInfo::onMovieBasicInfoFound( uint /*_uiQueryID*/, Data::MSMovieInfo* _pMovie )
     {
-        if( m_pQueriesMap[ _pReply ] == 1 )
+        if( NULL != _pMovie )
         {
-            m_pQueriesMap.take( _pReply );
-            const QByteArray data( _pReply->readAll() );
-
-            QPixmap pixmap;
-            pixmap.loadFromData(data);
-
-            m_pUI->TabInfo_Image_Label->setPixmap( pixmap );
-        }
-        else
-        {
-//            Tools::MSSearchEngine parser;
-//            Data::MSMovieInfo* pMovie = parser.parseContentToMovie( _pReply->readAll() );
-
-//            if( pMovie )
-//            {
-//                setContent( *pMovie );
-//            }
+            setContent( *_pMovie );
         }
     }
+
+//    void MSTabInfo::onReplyFinished( QNetworkReply* _pReply )
+//    {
+//        if( m_pQueriesMap[ _pReply ] == 1 )
+//        {
+//            m_pQueriesMap.take( _pReply );
+//            const QByteArray data( _pReply->readAll() );
+
+//            QPixmap pixmap;
+//            pixmap.loadFromData(data);
+
+//            m_pUI->TabInfo_Image_Label->setPixmap( pixmap );
+//        }
+//        else
+//        {
+////            Tools::MSSearchEngine parser;
+////            Data::MSMovieInfo* pMovie = parser.parseContentToMovie( _pReply->readAll() );
+
+////            if( pMovie )
+////            {
+////                setContent( *pMovie );
+////            }
+//        }
+//    }
 }

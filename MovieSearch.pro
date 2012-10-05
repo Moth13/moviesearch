@@ -40,7 +40,9 @@ HEADERS     +=  \
     include/MSSearchEngine_TMDB.h \
     include/MSSearchEngine.h \
     include/MSTools.h \
-    include/MSMainWindow.h
+    include/MSMainWindow.h \
+    include/MSDataMovie.h \
+    include/MSDataPersonn.h
 
 SOURCES     +=  src/main.cpp \
                 src/MSTabInfo.cpp \
@@ -50,6 +52,8 @@ SOURCES     +=  src/main.cpp \
 
 FORMS       +=  resources/MSMainwindow.ui \
                 resources/MSTabInfo.ui
+
+
 
 
 

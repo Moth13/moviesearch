@@ -12,7 +12,7 @@
 
 #include <QtCore>
 #include <QWidget>
-#include <QtNetwork>
+#include <QMovie>
 
 namespace Ui
 {
@@ -22,33 +22,42 @@ namespace Ui
 namespace Data
 {
     class MSData;
+    class MSMovieInfo;
 }
 
 namespace UI
 {
     class MSTabInfo : public QWidget
     {
-        Q_OBJECT
+            Q_OBJECT
+        public:
+            /*! Constructor */
+            explicit MSTabInfo(QWidget *parent = 0);
+            /*! Destructor */
+            virtual ~MSTabInfo();
 
-    public:
-        explicit MSTabInfo(QWidget *parent = 0);
-        ~MSTabInfo();
+            //------------------------------------------------------//
+            // Tools
+            /*! \return true if has a data */
+            bool hasData() const;
+            /*! \return Current screen data */
+            const Data::MSData& getCurrentData() const;
+            //------------------------------------------------------//
 
-        void searchFor( int iID );
+        private:
+            Ui::MSTabInfo*              m_pUI;
+            Data::MSData*               m_pData;
 
-        bool hasData() const;
-        const Data::MSData& getCurrentData() const;
+            QMovie*                     m_pWaitingAnimation;
 
-    private slots :
-        void onReplyFinished( QNetworkReply* );
+            //------------------------------------------------------//
+            // Tools
+            void setContent( const Data::MSData& rMSData );
+            //------------------------------------------------------//
 
-    private:
-        Ui::MSTabInfo*              m_pUI;
-        QNetworkAccessManager*      m_pNetworkManager;
-        QMap< QNetworkReply*, int > m_pQueriesMap;
-        Data::MSData*               m_pData;
-
-        void setContent( const Data::MSData& rMSData );
+        private slots :
+            /*! sigMoviesFromTitleFound handler slot */
+            void onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
     };
 }
 #endif // MSTABINFO_H

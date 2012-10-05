@@ -13,27 +13,36 @@
 #include <QMessageBox>
 
 #include <MSTools.h>
-#include <MSData.h>
-#include <MSTabInfo.h>
+
+#include <MSDataMovie.h>
+#include <MSDataPersonn.h>
+
 #include <MSSearchEngine.h>
+
+#include <MSTabInfo.h>
 
 namespace UI
 {
     MSMainWindow::MSMainWindow( QWidget* _pParent )
-        : QMainWindow               ( _pParent )
-        , m_pUI                     ( new Ui::MSMainWindow )
-        , m_xpCurrentSearchEngine   ( NULL )
-        , m_uiLastQueryID           ( 0 )
+        :   QMainWindow                 ( _pParent )
+        ,   m_pUI                       ( new Ui::MSMainWindow )
+        ,   m_pCompleter                ( NULL )
+        ,   m_pCompleterModel           ( NULL )
+        ,   m_xpCurrentSearchEngine     ( NULL )
+        ,   m_uiLastQueryID             ( 0 )
     {
         m_pUI->setupUi( this );
 
         connectToSearchEngine( Tools::MSSearchEngineManager::getAllSearchEngine()[ 0 ] );
 
-        QStandardItemModel *model = new QStandardItemModel();
-        m_pUI->SearchFor_TextEdit->setCompleter( new QCompleter(model, this) );
+        m_pCompleterModel   = new QStandardItemModel();
+        m_pCompleter        = new QCompleter( m_pCompleterModel, this );
+
+        m_pUI->SearchFor_TextEdit->setCompleter( m_pCompleter );
         m_pUI->SearchFor_TextEdit->installEventFilter( this );
-        m_pUI->SearchFor_TextEdit->completer()->setCompletionMode( QCompleter::UnfilteredPopupCompletion );
-        m_pUI->SearchFor_TextEdit->completer()->setCaseSensitivity( Qt::CaseInsensitive );
+
+        m_pCompleter->setCompletionMode( QCompleter::UnfilteredPopupCompletion );
+        m_pCompleter->setCaseSensitivity( Qt::CaseInsensitive );
     }
 
     MSMainWindow::~MSMainWindow()
@@ -41,6 +50,7 @@ namespace UI
         SAFE_DELETE( m_pUI );
 //        SAFE_LIST_DELETE( m_lpTabsInfo );
 //        SAFE_LIST_DELETE( m_lpDataSearchResult );
+        cleanResults();
     }
 
     void MSMainWindow::connectToSearchEngine( Tools::MSSearchEngine* _pSearchEngine )
@@ -58,50 +68,53 @@ namespace UI
         }
     }
 
+    void MSMainWindow::cleanResults()
+    {
+        QStringList lstrKeys = m_lpDataSearchResult.keys();
+        foreach( QString strKey, lstrKeys )
+        {
+            delete m_lpDataSearchResult.take( strKey );
+        }
+    }
+
     void MSMainWindow::onMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults )
     {
         if( m_uiLastQueryID == _uiQueryID )
         {
-            m_lpDataSearchResult.clear();
+            m_pUI->statusBar->showMessage( QObject::tr( "Results found!!" ) );
+            cleanResults();
+//            m_pCompleterModel->clear();
 
-            QStandardItemModel *model = (QStandardItemModel*)(m_pUI->SearchFor_TextEdit->completer()->model());
-            model->setRowCount( _lpResults.size() );
-            model->setColumnCount( 1 );
+            m_pCompleterModel->setRowCount( _lpResults.size() );
+            m_pCompleterModel->setColumnCount( 1 );
 
             for( int i = 0; i<_lpResults.size(); i++ )
             {
                 m_lpDataSearchResult.insert( _lpResults[ i ]->getName(), _lpResults[ i ] );
-                QStandardItem* item = new QStandardItem( _lpResults[ i ]->getName() );
-                item->setText( _lpResults[ i ]->getName() );
-                item->setIcon( QIcon( "../../../resources/simpson_Me.jpg" ) );
-    //            item->setSizeHint( QSize(192,98) );
-                model->setItem( i, 0, item );
 
-                ++i;
+                QStandardItem* pItem = new QStandardItem( "" );
+                pItem->setText( _lpResults[ i ]->getName() );
+                pItem->setIcon( QIcon( "../../../resources/simpson_Me.jpg" ) );
+    //            pItem->setSizeHint( QSize(192,98) );
+                m_pCompleterModel->setItem( i, 0, pItem );
             }
-        }
-    }
-
-    void MSMainWindow::onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie )
-    {
-        qDebug() << "onMovieBasicInfoFound";
-        if( m_uiLastQueryID == _uiQueryID )
-        {
-            MSTabInfo* pTab = new MSTabInfo();
-
-            m_pUI->lTabInfo_Widget->addTab( pTab, _pMovie->getTitle() );
-            m_pUI->lTabInfo_Widget->setCurrentIndex( m_lpTabsInfo.size() );
-            m_lpTabsInfo.push_back( pTab );
         }
     }
 
     void MSMainWindow::on_SearchFor_TextEdit_returnPressed()
     {
         qDebug() << "on_SearchFor_TextEdit_returnPressed";
-
         if( NULL != m_xpCurrentSearchEngine )
         {
             QString strResearch     = m_pUI->SearchFor_TextEdit->text();
+            MSTabInfo* pTab         = new MSTabInfo();
+
+            m_xpCurrentSearchEngine->doConnection( pTab );
+
+            m_pUI->lTabInfo_Widget->addTab( pTab, strResearch );
+            m_pUI->lTabInfo_Widget->setCurrentIndex( m_lpTabsInfo.size() );
+            m_lpTabsInfo.push_back( pTab );
+
             m_uiLastQueryID         = m_xpCurrentSearchEngine->getBasicMovieInfo( *static_cast< Data::MSMovieSearchResult* > ( m_lpDataSearchResult[ strResearch ] ) );
         }
         else
@@ -114,8 +127,15 @@ namespace UI
 
     void MSMainWindow::on_lTabInfo_Widget_tabCloseRequested(int index)
     {
+        qDebug() << "on_lTabInfo_Widget_tabCloseRequested";
+
         MSTabInfo* pTab = m_lpTabsInfo.takeAt( index );
         m_pUI->lTabInfo_Widget->removeTab( index );
+
+        if( NULL != m_xpCurrentSearchEngine )
+        {
+            m_xpCurrentSearchEngine->doDisconnection( pTab );
+        }
 
         delete pTab;
     }
@@ -141,7 +161,8 @@ namespace UI
 
             if( !strResearch.isEmpty() )
             {
-                m_uiLastQueryID         = m_xpCurrentSearchEngine->getMoviesFromTitle( strResearch );
+                m_uiLastQueryID = m_xpCurrentSearchEngine->getMoviesFromTitle( strResearch );
+                m_pUI->statusBar->showMessage( QObject::tr( "Searching for " ) + strResearch + "..." );
             }
         }
         else

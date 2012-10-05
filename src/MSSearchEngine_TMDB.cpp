@@ -57,7 +57,18 @@ namespace Tools
 
     uint MSSearchEngine_TMDB::getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult )
     {
-        return 0;
+        QNetworkRequest request;
+        QNetworkReply* pReply = NULL;
+
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/movie/" + QString::number( _rMovieSearchResult.getMovieID() ) +"?api_key=dc005c14d5fdaa914da77a1855473768" ) );
+
+        pReply = m_pNetworkManager->get( request );
+
+        uint uiQueryId = qHash( _rMovieSearchResult.getName() );
+        m_mQuery.insert( pReply, PQT( uiQueryId, 1 ) );
+
+        return uiQueryId;
     }
 
     void MSSearchEngine_TMDB::onNetworkManagerReply( QNetworkReply* _pReply )
@@ -65,41 +76,50 @@ namespace Tools
         PQT pairQueryType = m_mQuery[ _pReply ];
         QJson::Parser parser;
 
-        switch( pairQueryType.second )
+        bool bOk;
+        QList< Data::MSMovieSearchResult* > lpResult;
+        QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
+        if( bOk )
         {
-        case 0 :
-        {
-            bool bOk;
-            QList< Data::MSMovieSearchResult* > lpResult;
-            QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
-            if( bOk )
+            switch( pairQueryType.second )
             {
-                foreach( QVariant result, res[ "results" ].toList() )
+                case 0 :
                 {
-                    Data::MSMovieSearchResult* pResult  = new Data::MSMovieSearchResult();
-                    pResult->setName( result.toMap()[ "original_title" ].toString() );
-                    lpResult.push_back( pResult );
+                    foreach( QVariant result, res[ "results" ].toList() )
+                    {
+                        Data::MSMovieSearchResult* pResult = new Data::MSMovieSearchResult();
+                        pResult->setName( result.toMap()[ "original_title" ].toString() );
+                        pResult->setPoster( result.toMap()[ "poster_path" ].toString() );
+                        pResult->setMovieID( result.toMap()[ "id" ].toInt() );
+                        lpResult.push_back( pResult );
 
-//                    hContent.insert( i, result.toMap()[ "original_title" ].toString() );
-//                    ++i;
-//                    hContent.insert( i, QString( "http://cf2.imgobject.com/t/p/w185" ) + result.toMap()[ "poster_path" ].toString() );
-//                    ++i;
-//                    hContent.insert( i, result.toMap()[ "id" ].toString() );
-//                    ++i;
+                        //                    hContent.insert( i, result.toMap()[ "original_title" ].toString() );
+                        //                    ++i;
+                        //                    hContent.insert( i, QString( "http://cf2.imgobject.com/t/p/w185" ) + result.toMap()[ "poster_path" ].toString() );
+                        //                    ++i;
+                        //                    hContent.insert( i, result.toMap()[ "id" ].toString() );
+                        //                    ++i;
 
-//                    qDebug() << result.toMap()[ "original_title" ].toString().toUtf8().constData();
+                        //                    qDebug() << result.toMap()[ "original_title" ].toString().toUtf8().constData();
+                    }
+                    emit sigMoviesFromTitleFound( pairQueryType.first, lpResult );
                 }
+                break;
+                case 1 :
+                {
+                    Data::MSMovieInfo_TMDB* pMovie = new Data::MSMovieInfo_TMDB();
+                    QJson::QObjectHelper::qvariant2qobject( res, pMovie );
 
-                emit sigMoviesFromTitleFound( pairQueryType.first, lpResult );
-            }
-            else
-            {
-                qDebug( "parsing failed" );
+                    emit sigMovieBasicInfoFound( pairQueryType.first, pMovie );
+                }
+                break;
+                default :
+                break;
             }
         }
-        break;
-        default :
-        break;
+        else
+        {
+            qDebug( "parsing failed" );
         }
     }
 

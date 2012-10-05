@@ -1,11 +1,11 @@
 #ifndef MSDATA_TMDB_H
 #define MSDATA_TMDB_H
 
-#include <MSData.h>
+#include <MSDataMovie.h>
+#include <MSDataPersonn.h>
 
 namespace Data
 {
-
     class MSMovieInfo_TMDB: public MSMovieInfo
     {
             Q_OBJECT
