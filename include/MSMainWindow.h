@@ -22,7 +22,7 @@ namespace Data
 {
     class MSData;
     class MSMovieSearchResult;
-    class MSMovieInfo;
+    class MSPersonSearchResult;
 }
 
 namespace Tools
@@ -68,19 +68,19 @@ namespace UI
             // Search engine slot
             /*! sigMoviesFromTitleFound handler slot */
             void onMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults );
+            /*! sigPersonsFromNameFound handler slot */
+            void onPersonsFromNameFound( uint _uiQueryID, QList< Data::MSPersonSearchResult* > _lpResults );
             //------------------------------------------------------//
 
             //------------------------------------------------------//
             // UI slot
             void on_SearchFor_TextEdit_returnPressed();
-
             void on_lTabInfo_Widget_tabCloseRequested(int index);
-
             void on_actionClose_triggered();
-
             void on_actionAbout_MovieSearch_triggered();
-            //------------------------------------------------------//
             void on_SearchFor_TextEdit_textEdited(const QString &arg1);
+            void on_SearchEngine_Combox_activated(int index);
+            //------------------------------------------------------//
     };
 }
 

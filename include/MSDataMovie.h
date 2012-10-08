@@ -61,6 +61,17 @@ namespace Data
                 return m_strClassName == _rMSMovieSearchResult.getName();
             }
 
+            static bool lesser( MSMovieSearchResult* _p1, MSMovieSearchResult* _p2 )
+            {
+                bool bValue = false;
+                if ( NULL != _p1
+                     && NULL != _p2 )
+                {
+                    bValue = _p1->getName() < _p2->getName();
+                }
+                return bValue;
+            }
+
         private:
             QString m_strName;
             QString m_strPoster;

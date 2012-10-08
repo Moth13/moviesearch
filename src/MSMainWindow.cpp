@@ -15,7 +15,7 @@
 #include <MSTools.h>
 
 #include <MSDataMovie.h>
-#include <MSDataPersonn.h>
+#include <MSDataPerson.h>
 
 #include <MSSearchEngine.h>
 
@@ -32,8 +32,19 @@ namespace UI
         ,   m_uiLastQueryID             ( 0 )
     {
         m_pUI->setupUi( this );
+        m_pUI->radioButton_Movie->setChecked( true );
 
-        connectToSearchEngine( Tools::MSSearchEngineManager::getAllSearchEngine()[ 0 ] );
+        QList< Tools::MSSearchEngine* > lxpAllSearchEngine = Tools::MSSearchEngineManager::getAllSearchEngine();
+
+        foreach( Tools::MSSearchEngine* xpSE, lxpAllSearchEngine )
+        {
+            m_pUI->SearchEngine_Combox->addItem( xpSE->getIcon(), xpSE->getName() );
+        }
+
+        if( !lxpAllSearchEngine.isEmpty() )
+        {
+            connectToSearchEngine( lxpAllSearchEngine.first() );
+        }
 
         m_pCompleterModel   = new QStandardItemModel();
         m_pCompleter        = new QCompleter( m_pCompleterModel, this );
@@ -42,7 +53,10 @@ namespace UI
         m_pUI->SearchFor_TextEdit->installEventFilter( this );
 
         m_pCompleter->setCompletionMode( QCompleter::UnfilteredPopupCompletion );
+        m_pCompleter->setModelSorting( QCompleter::CaseSensitivelySortedModel );
         m_pCompleter->setCaseSensitivity( Qt::CaseInsensitive );
+
+        on_SearchFor_TextEdit_textEdited( "" );
     }
 
     MSMainWindow::~MSMainWindow()
@@ -97,6 +111,33 @@ namespace UI
     //            pItem->setSizeHint( QSize(192,98) );
                 m_pCompleterModel->setItem( i, 0, pItem );
             }
+            m_pCompleter->complete();
+            m_pCompleter->setCurrentRow( 0 );
+        }
+    }
+
+    void MSMainWindow::onPersonsFromNameFound( uint _uiQueryID, QList< Data::MSPersonSearchResult* > _lpResults )
+    {
+        if( m_uiLastQueryID == _uiQueryID )
+        {
+            m_pUI->statusBar->showMessage( QObject::tr( "Results found!!" ) );
+            cleanResults();
+
+            m_pCompleterModel->setRowCount( _lpResults.size() );
+            m_pCompleterModel->setColumnCount( 1 );
+
+            for( int i = 0; i<_lpResults.size(); i++ )
+            {
+                m_mDataSearchResult.insert( _lpResults[ i ]->getName(), _lpResults[ i ] );
+
+                QStandardItem* pItem = new QStandardItem( "" );
+                pItem->setText( _lpResults[ i ]->getName() );
+                pItem->setIcon( QIcon( "../../../resources/simpson_Me.jpg" ) );
+    //            pItem->setSizeHint( QSize(192,98) );
+                m_pCompleterModel->setItem( i, 0, pItem );
+            }
+            m_pCompleter->complete();
+            m_pCompleter->setCurrentRow( 0 );
         }
     }
 
@@ -114,7 +155,15 @@ namespace UI
             m_pUI->lTabInfo_Widget->setCurrentIndex( m_lpTabsInfo.size() );
             m_lpTabsInfo.push_back( pTab );
 
-            uint uiQueryID          = m_xpCurrentSearchEngine->getBasicMovieInfo( *static_cast< Data::MSMovieSearchResult* > ( m_mDataSearchResult[ strResearch ] ) );
+            uint uiQueryID = 0;
+            if( m_pUI->radioButton_Movie->isChecked() )
+            {
+                uiQueryID = m_xpCurrentSearchEngine->getBasicMovieInfo( *static_cast< Data::MSMovieSearchResult* > ( m_mDataSearchResult[ strResearch ] ) );
+            }
+            else if( m_pUI->radioButton_Person->isChecked() )
+            {
+                uiQueryID = m_xpCurrentSearchEngine->getBasicPersonInfo( *static_cast< Data::MSPersonSearchResult* > ( m_mDataSearchResult[ strResearch ] ) );
+            }
             pTab->setQueryID( uiQueryID );
 
             m_mDataSearchResult.clear();
@@ -162,15 +211,22 @@ namespace UI
 
     void MSMainWindow::on_SearchFor_TextEdit_textEdited( const QString &arg1 )
     {
+        m_pCompleter->complete();
+
         if( NULL != m_xpCurrentSearchEngine )
         {
             QString strResearch = m_pUI->SearchFor_TextEdit->text();
 
-            if( !strResearch.isEmpty() )
+//            if( !strResearch.isEmpty() )
+            if( m_pUI->radioButton_Movie->isChecked() )
             {
                 m_uiLastQueryID = m_xpCurrentSearchEngine->getMoviesFromTitle( strResearch );
-                m_pUI->statusBar->showMessage( QObject::tr( "Searching for " ) + strResearch + "..." );
             }
+            else if( m_pUI->radioButton_Person->isChecked() )
+            {
+                m_uiLastQueryID = m_xpCurrentSearchEngine->getPersonsFromName( strResearch );
+            }
+            m_pUI->statusBar->showMessage( QObject::tr( "Searching for " ) + strResearch + "..." );
         }
         else
         {
@@ -178,5 +234,10 @@ namespace UI
                                   , QObject::tr( "Error" )
                                   , QObject::tr( "Please selecte a search engine." ) );
         }
+    }
+
+    void MSMainWindow::on_SearchEngine_Combox_activated(int index)
+    {
+        connectToSearchEngine( Tools::MSSearchEngineManager::getAllSearchEngine()[ index ] );
     }
 }

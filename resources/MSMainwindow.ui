@@ -86,7 +86,7 @@
      <string>Search for : </string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="SearchEngine_Combox">
     <property name="geometry">
      <rect>
       <x>890</x>
@@ -96,7 +96,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="SearchEngine_Label">
     <property name="geometry">
      <rect>
       <x>890</x>
@@ -109,7 +109,7 @@
      <string>Available search engine : </string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QRadioButton" name="radioButton_Movie">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -122,7 +122,7 @@
      <string>Movie</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QRadioButton" name="radioButton_Person">
     <property name="geometry">
      <rect>
       <x>190</x>

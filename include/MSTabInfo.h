@@ -29,6 +29,7 @@ namespace Data
 {
     class MSData;
     class MSMovieInfo;
+    class MSPersonInfo;
 }
 
 namespace UI
@@ -70,8 +71,10 @@ namespace UI
             //------------------------------------------------------//
 
         private slots :
-            /*! sigMoviesFromTitleFound handler slot */
+            /*! sigMovieBasicInfoFound handler slot */
             void onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
+            /*! sigPersonBasicInfoFound handler slot */
+            void onPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pPerson );
             /*! sigImageFound handler slot */
             void onImageFound( uint _uiQueryID, QPixmap* _pPixmap );
     };

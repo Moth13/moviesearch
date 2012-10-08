@@ -2,7 +2,7 @@
 #define MSDATA_TMDB_H
 
 #include <MSDataMovie.h>
-#include <MSDataPersonn.h>
+#include <MSDataPerson.h>
 
 namespace Data
 {

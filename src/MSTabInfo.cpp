@@ -11,7 +11,7 @@
 #include <ui_MSTabInfo.h>
 
 #include <MSDataMovie.h>
-#include <MSDataPersonn.h>
+#include <MSDataPerson.h>
 
 #include <MSSearchEngine.h>
 
@@ -100,7 +100,32 @@ namespace UI
         if( rMSData.getType().contains( "MSPersonInfo" ) )
         {
             bContentUsed = true;
-            qWarning( "Not yet implemented" );
+
+            m_mQueryImage.clear();
+
+            qDebug() <<"rMSData is a MSPersonInfo";
+            qDebug() << rMSData.toString();
+
+            const Data::MSPersonInfo& rPerson = static_cast< const Data::MSPersonInfo& >( rMSData );
+            m_pUI->TabInfo_Title_Label->setText( rPerson.getName() );
+            m_pUI->TabInfo_Tagline_Label->setText( "" );
+
+            QString strOverview;
+            strOverview += rPerson.getBirthday().toString( "dd.MM.yyyy" ) + " ";
+            strOverview += rPerson.getPlaceOfBirth();
+            m_pUI->TabInfo_Overview_Label->setText( strOverview );
+            m_pUI->TabInfo_ReleaseDate_Label->setText( "" );
+            m_pUI->TabInfo_VoteAverage_Label->setText( "" );
+            m_pUI->TabInfo_VoteCount_Label->setText( "" );
+            m_pUI->TabInfo_Homepage_Label->setText( rPerson.getHomepage().toString() );
+
+            if( NULL != m_xpSearchEngine )
+            {
+                uint uiQueryId = m_xpSearchEngine->getImage( rPerson.getProfilePath(), Tools::MSSearchEngine::POSTER );
+                m_mQueryImage.insert( uiQueryId, m_pUI->TabInfo_Image_Label );
+            }
+
+            qDebug() <<"Setting it done";
         }
 
         if( bContentUsed )
@@ -124,6 +149,15 @@ namespace UI
             && NULL != _pMovie )
         {
             setContent( *_pMovie );
+        }
+    }
+
+    void MSTabInfo::onPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pPerson )
+    {
+        if( m_uiDataQueryID == _uiQueryID
+            && NULL != _pPerson )
+        {
+            setContent( *_pPerson );
         }
     }
 

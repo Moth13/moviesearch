@@ -21,11 +21,15 @@ namespace Tools
 {
 
     MSSearchEngine_TMDB::MSSearchEngine_TMDB()
-        :   m_pNetworkManager   ( NULL )
+        :   MSSearchEngine      ( )
+        ,   m_pNetworkManager   ( NULL )
     {
-        m_pNetworkManager = new QNetworkAccessManager( this );
+        m_strPixIconName    = "../../../resources/tmdb-logo.png";
+        m_strName           = "TMDB";
 
-        bool bIsConnected = QObject::connect( m_pNetworkManager
+        m_pNetworkManager   = new QNetworkAccessManager( this );
+
+        bool bIsConnected   = QObject::connect( m_pNetworkManager
                                               , SIGNAL( finished( QNetworkReply* ) )
                                               , this
                                               , SLOT( onNetworkManagerReply( QNetworkReply* ) )
@@ -50,7 +54,7 @@ namespace Tools
         pReply = m_pNetworkManager->get( request );
 
         uint uiQueryId = qHash( _rstrTitle );
-        m_mQuery.insert( pReply, PQT( uiQueryId, 0 ) );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Movie_Search ) );
 
         return uiQueryId;
     }
@@ -66,7 +70,39 @@ namespace Tools
         pReply = m_pNetworkManager->get( request );
 
         uint uiQueryId = qHash( _rMovieSearchResult.getName() );
-        m_mQuery.insert( pReply, PQT( uiQueryId, 1 ) );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Movie_Info ) );
+
+        return uiQueryId;
+    }
+
+    uint MSSearchEngine_TMDB::getPersonsFromName( const QString& _rstrName )
+    {
+        QNetworkRequest request;
+        QNetworkReply* pReply = NULL;
+
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/search/person?api_key=dc005c14d5fdaa914da77a1855473768&query=" + _rstrName ) );
+
+        pReply = m_pNetworkManager->get( request );
+
+        uint uiQueryId = qHash( _rstrName );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Person_Search ) );
+
+        return uiQueryId;
+    }
+
+    uint MSSearchEngine_TMDB::getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult )
+    {
+        QNetworkRequest request;
+        QNetworkReply* pReply = NULL;
+
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/person/" + QString::number( _rPersonSearchResult.getPersonID() ) +"?api_key=dc005c14d5fdaa914da77a1855473768" ) );
+
+        pReply = m_pNetworkManager->get( request );
+
+        uint uiQueryId = qHash( _rPersonSearchResult.getName() );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Person_Info ) );
 
         return uiQueryId;
     }
@@ -83,7 +119,7 @@ namespace Tools
         pReply = m_pNetworkManager->get( request );
 
         uint uiQueryId = qHash( _rstrImageName );
-        m_mQuery.insert( pReply, PQT( uiQueryId, 2 ) );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Image_Get ) );
 
         return uiQueryId;
     }
@@ -95,13 +131,14 @@ namespace Tools
         bool bOk;
         switch( pairQueryType.second )
         {
-            case 0 :
+            case Movie_Search :
             {
-                QList< Data::MSMovieSearchResult* > lpResult;
                 QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
 
                 if( bOk )
                 {
+                    QList< Data::MSMovieSearchResult* > lpResult;
+
                     foreach( QVariant result, res[ "results" ].toList() )
                     {
                         Data::MSMovieSearchResult* pResult = new Data::MSMovieSearchResult();
@@ -110,6 +147,8 @@ namespace Tools
                         pResult->setMovieID( result.toMap()[ "id" ].toInt() );
                         lpResult.push_back( pResult );
                     }
+                    qSort( lpResult.begin(), lpResult.end(), Data::MSMovieSearchResult::lesser );
+
                     emit sigMoviesFromTitleFound( pairQueryType.first, lpResult );
                 }
                 else
@@ -118,7 +157,7 @@ namespace Tools
                 }
             }
             break;
-            case 1 :
+            case Movie_Info :
             {
                 QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
 
@@ -135,7 +174,50 @@ namespace Tools
                 }
             }
             break;
-            case 2 :
+            case Person_Search :
+            {
+                QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
+
+                if( bOk )
+                {
+                    QList< Data::MSPersonSearchResult* > lpResult;
+
+                    foreach( QVariant result, res[ "results" ].toList() )
+                    {
+                        Data::MSPersonSearchResult* pResult = new Data::MSPersonSearchResult();
+                        pResult->setName( result.toMap()[ "name" ].toString() );
+                        pResult->setPoster( result.toMap()[ "profile_path" ].toString() );
+                        pResult->setPersonID( result.toMap()[ "id" ].toInt() );
+                        lpResult.push_back( pResult );
+                    }
+                    qSort( lpResult.begin(), lpResult.end(), Data::MSPersonSearchResult::lesser );
+
+                    emit sigPersonsFromNameFound( pairQueryType.first, lpResult );
+                }
+                else
+                {
+                    qDebug()<< "parsing failed";
+                }
+            }
+            break;
+            case Person_Info :
+            {
+                QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
+
+                if( bOk )
+                {
+                    Data::MSPersonInfo_TMDB* pPerson  = new Data::MSPersonInfo_TMDB();
+                    QJson::QObjectHelper::qvariant2qobject( res, pPerson );
+
+                    emit sigPersonBasicInfoFound( pairQueryType.first, pPerson );
+                }
+                else
+                {
+                    qDebug()<< "parsing failed";
+                }
+            }
+            break;
+            case Image_Get :
             {
                 QPixmap* pPixmap = new QPixmap();
                 pPixmap->loadFromData( _pReply->readAll() );

@@ -26,6 +26,18 @@ namespace Tools
             \return a queryId
         */
         virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult );
+
+        /*!
+            Get all persons from a name
+            \return aqueryId
+        */
+        virtual uint getPersonsFromName( const QString& _rstrName );
+        /*!
+            Get basic information from a MSMMovieSearchResult
+            \return a queryId
+        */
+        virtual uint getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult );
+
         /*!
             Get basic information from a MSMMovieSearchResult
             \return a queryId
@@ -40,13 +52,20 @@ namespace Tools
     private :
         //------------------------------------------------------//
         // Attributs
+        enum eQueryType
+        {   Movie_Search = 0
+        ,   Movie_Info
+        ,   Person_Search
+        ,   Person_Info
+        ,   Image_Get
+        };
+
         QNetworkAccessManager *         m_pNetworkManager;      ///< Network request manager
         QMap< QNetworkReply*, PQT >     m_mQuery;               ///< Map of research
         //------------------------------------------------------//
 
         //------------------------------------------------------//
         // Tools
-
         //------------------------------------------------------//
     private slots :
         //------------------------------------------------------//

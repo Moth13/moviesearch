@@ -1,7 +1,7 @@
 #include <MSSearchEngine.h>
 
 #include <MSDataMovie.h>
-#include <MSDataPersonn.h>
+#include <MSDataPerson.h>
 
 #include <MSMainWindow.h>
 #include <MSTabInfo.h>
@@ -12,13 +12,15 @@ namespace Tools
 {
     MSSearchEngine::MSSearchEngine()
         :   m_strName       ( "Fake SearchEngine" )
-//        ,   m_pixIcon       ( "../../resources/simpson_Me.jpg" )
+        ,   m_pPixIcon      ( NULL )
     {
     }
 
     MSSearchEngine::~MSSearchEngine()
     {
         qDebug() << QString( "Destroying %1" ).arg( m_strName );
+
+        delete m_pPixIcon;
     }
 
     void MSSearchEngine::doConnection( UI::MSMainWindow* _xpMainWindow )
@@ -29,6 +31,12 @@ namespace Tools
                               , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
                               , _xpMainWindow
                               , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) )
+                              , _xpMainWindow
+                              , SLOT( onPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) )
                               , Qt::UniqueConnection );
         }
     }
@@ -43,6 +51,12 @@ namespace Tools
                               , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , _xpTabInfo
                               , SLOT( onMovieBasicInfoFound( uint,Data::MSMovieInfo* ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
+                              , _xpTabInfo
+                              , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
                               , Qt::UniqueConnection );
 
             QObject::connect( this
@@ -61,6 +75,11 @@ namespace Tools
                               , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
                               , _xpMainWindow
                               , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) )
+                              , _xpMainWindow
+                              , SLOT( onPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) ) );
         }
     }
 
@@ -72,6 +91,11 @@ namespace Tools
                               , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , _xpTabInfo
                               , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
+                              , _xpTabInfo
+                              , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) ) );
 
             QObject::disconnect( this
                               , SIGNAL( sigImageFound( uint, QPixmap* ) )
@@ -91,6 +115,8 @@ namespace Tools
 
     void MSSearchEngineManager::loadAllSearchEngines()
     {
+        s_lpSearchEngine.push_back( new Tools::MSSearchEngine_TMDB() );
+        s_lpSearchEngine.push_back( new Tools::MSSearchEngine_TMDB() );
         s_lpSearchEngine.push_back( new Tools::MSSearchEngine_TMDB() );
     }
 

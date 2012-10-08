@@ -17,6 +17,9 @@ namespace Data
 {
     class MSMovieInfo;
     class MSMovieSearchResult;
+
+    class MSPersonInfo;
+    class MSPersonSearchResult;
 }
 
 namespace UI
@@ -46,7 +49,14 @@ namespace Tools
         /*! \return Search Engine's name */
         inline const QString& getName() const{ return m_strName; }
         /*! \return Search Engine's icon */
-//        const QPixmap& getIcon() const { return m_pixIcon ; }
+        const QPixmap& getIcon()
+        {
+            if( NULL == m_pPixIcon )
+            {
+                m_pPixIcon = new QPixmap( m_strPixIconName );
+            }
+            return *m_pPixIcon;
+        }
         //------------------------------------------------------//
 
         //------------------------------------------------------//
@@ -61,15 +71,27 @@ namespace Tools
         //------------------------------------------------------//
         // Search functions
         /*!
-            Get basic information from a MSMMovieSearchResult
-            \return a queryId
-        */
-        virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult ) = 0;
-        /*!
             Get all movie from a title
             \return aqueryId
         */
         virtual uint getMoviesFromTitle( const QString& _rstrTitle ) = 0;
+        /*!
+            Get basic information from a MSMMovieSearchResult
+            \return a queryId
+        */
+        virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult ) = 0;
+
+        /*!
+            Get all persons from a name
+            \return aqueryId
+        */
+        virtual uint getPersonsFromName( const QString& _rstrName ) = 0;
+        /*!
+            Get basic information from a MSMMovieSearchResult
+            \return a queryId
+        */
+        virtual uint getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult ) = 0;
+
         /*!
             Get basic information from a MSMMovieSearchResult
             \return a queryId
@@ -84,6 +106,12 @@ namespace Tools
         void sigMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults );
         /*! Signal emitted when get basic movie info is completed */
         void sigMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
+
+        /*! Signal emitted when get persons from name is completed */
+        void sigPersonsFromNameFound( uint _uiQueryID, QList< Data::MSPersonSearchResult* > _lpResults );
+        /*! Signal emitted when get basic movie info is completed */
+        void sigPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pMovie );
+
         /*! Signal emitted when get image is completed */
         void sigImageFound( uint _uiQueryID, QPixmap* _pPixmap );
         //------------------------------------------------------//
@@ -96,8 +124,9 @@ namespace Tools
 
         //------------------------------------------------------//
         // Attributs
-        QString m_strName;
-//        QPixmap m_pixIcon;
+        QString     m_strName;
+        QString     m_strPixIconName;
+        QPixmap*    m_pPixIcon;
         //------------------------------------------------------//
     private :
     };
