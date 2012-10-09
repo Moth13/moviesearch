@@ -2,7 +2,7 @@
  * MSDataMovie.h
  *
  * Author(s):
- * - Jeremie GUERINEL 
+ * - Jeremie GUERINEL
  *
  * Created 2012-10-5
  */
@@ -192,6 +192,80 @@ namespace Data
             QString m_strPosterPath;
             int m_iID;
             int m_iImdbId;
+    };
+
+    /*! \class Describing movie cast*/
+    class MSMovieCast: public MSData
+    {
+        public:
+            explicit MSMovieCast( QObject* parent = NULL ) : MSData( parent ) { m_strClassName = "MSMovieCast"; }
+            MSMovieCast( const MSMovieCast& _rMSMovieCast ) : MSData( _rMSMovieCast.parent() )
+            {
+                m_strClassName      = _rMSMovieCast.getType();
+                m_strCharacterName  = _rMSMovieCast.getCharacterName();
+                m_strActorName      = _rMSMovieCast.getActorName();
+                m_strActorImage     = _rMSMovieCast.getActorImage();
+                m_iActorID          = _rMSMovieCast.getActorID();
+                m_iCastPos          = _rMSMovieCast.getCastPos();
+            }
+            ~MSMovieCast(){}
+
+            // setFunction
+            inline void setCharacterName( const QString& _rstrCharaterName ){ m_strCharacterName = _rstrCharaterName; }
+            inline void setActorName( const QString& _rstrActorName ){ m_strActorName = _rstrActorName; }
+            inline void setActorImage( const QString& _rstrActorImage ){ m_strActorImage = _rstrActorImage; }
+            inline void setActorID( int _iActorID ){ m_iActorID = _iActorID; }
+            inline void setCastPos( int _iCastPos  ){ m_iCastPos = _iCastPos; }
+
+            // getFunction
+            inline const QString& getCharacterName() const { return m_strCharacterName; }
+            inline const QString& getActorName() const { return m_strActorName; }
+            inline const QString& getActorImage() const { return m_strActorImage; }
+            inline int getActorID() const { return m_iActorID; }
+            inline int getCastPos() const { return m_iCastPos; }
+
+            // tools
+            virtual bool isValid() const { return m_iActorID != -1; }
+            virtual QString toString() const
+            {
+                QString strReturn;
+                strReturn += m_strCharacterName + "; ";
+                strReturn += m_strActorName + "; ";
+                strReturn += m_strActorImage + "; ";
+                strReturn += QString::number( m_iActorID ) + "; ";
+                strReturn += QString::number( m_iCastPos ) + "; ";
+
+                return strReturn;
+            }
+
+            inline MSMovieCast& operator=( const MSMovieCast& _rMSMovieCast )
+            {
+                Q_ASSERT( m_strClassName == _rMSMovieCast.getType() );
+
+                m_strCharacterName  = _rMSMovieCast.getCharacterName();
+                m_strActorName      = _rMSMovieCast.getActorName();
+                m_strActorImage     = _rMSMovieCast.getActorImage();
+                m_iActorID          = _rMSMovieCast.getActorID();
+                m_iCastPos          = _rMSMovieCast.getCastPos();
+
+                return *this;
+            }
+            inline bool operator==( const MSMovieCast& _rMSMovieCast )
+            {
+                return m_strClassName           == _rMSMovieCast.getType()
+                        && m_strCharacterName   == _rMSMovieCast.getCharacterName()
+                        && m_strActorName       == _rMSMovieCast.getActorName()
+                        && m_strActorImage      == _rMSMovieCast.getActorImage()
+                        && m_iActorID           == _rMSMovieCast.getActorID()
+                        && m_iCastPos           == _rMSMovieCast.getCastPos();
+            }
+
+        private:
+            QString m_strCharacterName;
+            QString m_strActorName;
+            QString m_strActorImage;
+            int m_iActorID;
+            int m_iCastPos;
     };
 }
 

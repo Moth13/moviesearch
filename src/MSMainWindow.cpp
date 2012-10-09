@@ -89,6 +89,8 @@ namespace UI
         {
             delete m_mDataSearchResult.take( strKey );
         }
+
+        m_mQueryImage.clear();
     }
 
     void MSMainWindow::onMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults )
@@ -108,8 +110,10 @@ namespace UI
                 QStandardItem* pItem = new QStandardItem( "" );
                 pItem->setText( _lpResults[ i ]->getName() );
                 pItem->setIcon( QIcon( "../../../resources/simpson_Me.jpg" ) );
-    //            pItem->setSizeHint( QSize(192,98) );
                 m_pCompleterModel->setItem( i, 0, pItem );
+
+                uint uiQueryId = m_xpCurrentSearchEngine->getImage( _lpResults[ i ]->getPoster(), Tools::MSSearchEngine::ICON );
+                m_mQueryImage.insert( uiQueryId, pItem );
             }
             m_pCompleter->complete();
             m_pCompleter->setCurrentRow( 0 );
@@ -133,12 +137,25 @@ namespace UI
                 QStandardItem* pItem = new QStandardItem( "" );
                 pItem->setText( _lpResults[ i ]->getName() );
                 pItem->setIcon( QIcon( "../../../resources/simpson_Me.jpg" ) );
-    //            pItem->setSizeHint( QSize(192,98) );
                 m_pCompleterModel->setItem( i, 0, pItem );
+
+                uint uiQueryId = m_xpCurrentSearchEngine->getImage( _lpResults[ i ]->getPoster(), Tools::MSSearchEngine::ICON );
+                m_mQueryImage.insert( uiQueryId, pItem );
             }
             m_pCompleter->complete();
             m_pCompleter->setCurrentRow( 0 );
         }
+    }
+
+    void MSMainWindow::onImageFound( uint _uiQueryID, QPixmap* _pPixmap )
+    {
+        if( m_mQueryImage.contains( _uiQueryID )
+            && NULL != m_mQueryImage[ _uiQueryID ]
+            && NULL != _pPixmap )
+        {
+            m_mQueryImage[ _uiQueryID ]->setIcon( QIcon( *_pPixmap ) );
+        }
+
     }
 
     void MSMainWindow::on_SearchFor_TextEdit_returnPressed()

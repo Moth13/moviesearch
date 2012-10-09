@@ -15,6 +15,8 @@
 
 #include <MSSearchEngine.h>
 
+#include <QMovie>
+
 namespace UI
 {
     MSTabInfo::MSTabInfo( QWidget* _pParent )
@@ -91,8 +93,12 @@ namespace UI
 
             if( NULL != m_xpSearchEngine )
             {
-                uint uiQueryId = m_xpSearchEngine->getImage( rMovie.getPosterPath(), Tools::MSSearchEngine::POSTER );
+                uint uiQueryId = 0;
+                uiQueryId = m_xpSearchEngine->getImage( rMovie.getPosterPath(), Tools::MSSearchEngine::POSTER );
                 m_mQueryImage.insert( uiQueryId, m_pUI->TabInfo_Image_Label );
+
+                m_uiCastQueryID     = m_xpSearchEngine->getMovieCast( rMovie );
+                m_uiImagesQueryID   = m_xpSearchEngine->getDataImageFrom( rMovie );
             }
 
             qDebug() <<"Setting it done";
@@ -121,7 +127,8 @@ namespace UI
 
             if( NULL != m_xpSearchEngine )
             {
-                uint uiQueryId = m_xpSearchEngine->getImage( rPerson.getProfilePath(), Tools::MSSearchEngine::POSTER );
+                uint uiQueryId = 0;
+                uiQueryId = m_xpSearchEngine->getImage( rPerson.getProfilePath(), Tools::MSSearchEngine::POSTER );
                 m_mQueryImage.insert( uiQueryId, m_pUI->TabInfo_Image_Label );
             }
 
@@ -152,12 +159,86 @@ namespace UI
         }
     }
 
+    void MSTabInfo::onMovieCastFound( uint _uiQueryID, QList< Data::MSMovieCast* > _lpMovie )
+    {
+        if( m_uiCastQueryID == _uiQueryID )
+        {
+            // clear old list
+            while( !m_lpMovieCast.isEmpty() )
+            {
+                delete m_lpMovieCast.takeLast();
+            }
+            Q_ASSERT( m_lpMovieCast.isEmpty() );
+
+            m_lpMovieCast = _lpMovie;
+
+            m_pUI->TabInfo_Cast->clear();
+            m_pUI->TabInfo_Cast->setRowCount( m_lpMovieCast.size() );
+            m_pUI->TabInfo_Cast->setColumnCount( 2 );
+            m_mQueryIcon.clear();
+
+            int i = 0;
+            foreach( Data::MSMovieCast* pMovieCast, m_lpMovieCast )
+            {
+                QTableWidgetItem* pItemCast = new QTableWidgetItem();
+                QTableWidgetItem* pItemIcon = new QTableWidgetItem();
+                pItemCast->setText( pMovieCast->getActorName() + QObject::tr( " as " ) + pMovieCast->getCharacterName() );
+                m_pUI->TabInfo_Cast->setItem( i, 0, pItemIcon );
+                m_pUI->TabInfo_Cast->setItem( i, 1, pItemCast );
+
+                QRect rect = m_pUI->TabInfo_Cast->fontMetrics().boundingRect( pItemCast->text() );
+                m_pUI->TabInfo_Cast->setColumnWidth( 1, std::max( m_pUI->TabInfo_Cast->columnWidth( 1 ), rect.width() ) );
+
+                if( NULL != m_xpSearchEngine )
+                {
+                    uint uiQueryId = m_xpSearchEngine->getImage( pMovieCast->getActorImage(), Tools::MSSearchEngine::ICON );
+                    m_mQueryIcon.insert( uiQueryId, pItemIcon );
+                }
+                ++i;
+            }
+        }
+    }
+
     void MSTabInfo::onPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pPerson )
     {
         if( m_uiDataQueryID == _uiQueryID
             && NULL != _pPerson )
         {
             setContent( *_pPerson );
+        }
+    }
+
+    void MSTabInfo::onDataImagesFound( uint _uiQueryID, QList< Data::MSDataImage* > _lpDataImage )
+    {
+        if( m_uiImagesQueryID == _uiQueryID )
+        {
+            // clear old list
+            while( !m_lpImages.isEmpty() )
+            {
+                delete m_lpImages.takeLast();
+            }
+            Q_ASSERT( m_lpImages.isEmpty() );
+
+            m_pUI->TabInfo_Images->clear();
+            m_pUI->TabInfo_Images->setRowCount( 1 );
+            m_pUI->TabInfo_Images->setColumnCount( _lpDataImage.size() );
+
+            int i = 0;
+            foreach( Data::MSDataImage* pDataImage, _lpDataImage )
+            {
+                MSImage* pImage = new MSImage();
+                m_pUI->TabInfo_Images->setCellWidget( 0, i, pImage );
+
+                 m_pUI->TabInfo_Images->setColumnWidth( i, ( m_pUI->TabInfo_Images->geometry().height() - 5 ) * ( pDataImage->getAspectRatio() ) );
+
+                if( NULL != m_xpSearchEngine )
+                {
+                    uint uiQueryId = m_xpSearchEngine->getImage( pDataImage->getImageFile(), Tools::MSSearchEngine::POSTER );
+                    m_mQueryImage.insert( uiQueryId, pImage );
+                }
+                m_lpImages.push_back( pImage );
+                ++i;
+            }
         }
     }
 
@@ -169,5 +250,17 @@ namespace UI
         {
             m_mQueryImage[ _uiQueryID ]->onPixmapReceived( *_pPixmap );
         }
+
+        if( m_mQueryIcon.contains( _uiQueryID )
+            && NULL != m_mQueryIcon[ _uiQueryID ]
+            && NULL != _pPixmap )
+        {
+            m_mQueryIcon[ _uiQueryID ]->setIcon( QIcon( *_pPixmap ) );
+        }
+    }
+
+    void MSTabInfo::on_listView_doubleClicked( const QModelIndex &index )
+    {
+
     }
 }

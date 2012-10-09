@@ -52,6 +52,7 @@ namespace UI
 
             Tools::MSSearchEngine*          m_xpCurrentSearchEngine;    ///< Current search engine
             QMap< QString, Data::MSData* >  m_mDataSearchResult;       ///< Search result
+            QMap< uint, QStandardItem* >    m_mQueryImage;
 
             uint                            m_uiLastQueryID;
 
@@ -70,6 +71,9 @@ namespace UI
             void onMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults );
             /*! sigPersonsFromNameFound handler slot */
             void onPersonsFromNameFound( uint _uiQueryID, QList< Data::MSPersonSearchResult* > _lpResults );
+
+            /*! sigImageFound handler slot */
+            void onImageFound( uint _uiQueryID, QPixmap* _pPixmap );
             //------------------------------------------------------//
 
             //------------------------------------------------------//

@@ -26,6 +26,11 @@ namespace Tools
             \return a queryId
         */
         virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult );
+        /*!
+            Get, for a MSMovie, associate casting
+            \return a queryId
+        */
+        virtual uint getMovieCast( const Data::MSMovieInfo& _rMovie ) ;
 
         /*!
             Get all persons from a name
@@ -39,7 +44,12 @@ namespace Tools
         virtual uint getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult );
 
         /*!
-            Get basic information from a MSMMovieSearchResult
+            Get a data image
+            \return a queryId
+        */
+        virtual uint getDataImageFrom( const Data::MSData& _rMSData );
+        /*!
+            Get an image
             \return a queryId
         */
         virtual uint getImage( const QString& _rstrImageName, eImageType _eImageType );
@@ -55,8 +65,10 @@ namespace Tools
         enum eQueryType
         {   Movie_Search = 0
         ,   Movie_Info
+        ,   Movie_Cast
         ,   Person_Search
         ,   Person_Info
+        ,   DataImage_Get
         ,   Image_Get
         };
 

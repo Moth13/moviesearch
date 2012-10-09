@@ -30,10 +30,10 @@ namespace Tools
         m_pNetworkManager   = new QNetworkAccessManager( this );
 
         bool bIsConnected   = QObject::connect( m_pNetworkManager
-                                              , SIGNAL( finished( QNetworkReply* ) )
-                                              , this
-                                              , SLOT( onNetworkManagerReply( QNetworkReply* ) )
-                                              , Qt::UniqueConnection );
+                                                , SIGNAL( finished( QNetworkReply* ) )
+                                                , this
+                                                , SLOT( onNetworkManagerReply( QNetworkReply* ) )
+                                                , Qt::UniqueConnection );
 
         Q_ASSERT( bIsConnected && "Network manager has been not successfully connected" );
     }
@@ -75,6 +75,22 @@ namespace Tools
         return uiQueryId;
     }
 
+    uint MSSearchEngine_TMDB::getMovieCast( const Data::MSMovieInfo& _rMovie )
+    {
+        QNetworkRequest request;
+        QNetworkReply* pReply = NULL;
+
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/movie/" + QString::number( _rMovie.getId() ) +"/casts?api_key=dc005c14d5fdaa914da77a1855473768" ) );
+
+        pReply = m_pNetworkManager->get( request );
+
+        uint uiQueryId = qHash( _rMovie.getTitle() );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Movie_Cast ) );
+
+        return uiQueryId;
+    }
+
     uint MSSearchEngine_TMDB::getPersonsFromName( const QString& _rstrName )
     {
         QNetworkRequest request;
@@ -107,11 +123,60 @@ namespace Tools
         return uiQueryId;
     }
 
-    uint MSSearchEngine_TMDB::getImage( const QString& _rstrImageName, eImageType /*_eImageType*/ )
+    uint MSSearchEngine_TMDB::getDataImageFrom( const Data::MSData& _rMSData )
     {
-        qDebug()<< "getImage";
+        QString strQuery;
+        QString strSearchType;
+        int iID = 0;
+        if( _rMSData.getType().contains( "MSMovieInfo" ) )
+        {
+            strSearchType   = "movie";
+            iID             = static_cast< const Data::MSMovieInfo& >( _rMSData ).getId();
+            strQuery        = "DataImage_" + static_cast< const Data::MSMovieInfo& >( _rMSData ).getTitle();
+        }
+        if( _rMSData.getType().contains( "MSPersonInfo" ) )
+        {
+            strSearchType   = "person";
+            iID             = static_cast< const Data::MSPersonInfo& >( _rMSData ).getId();
+            strQuery        = "DataImage_" + static_cast< const Data::MSPersonInfo& >( _rMSData ).getName();
+        }
+
+        uint uiQueryId = 0;
+        if( !strSearchType.isEmpty() )
+        {
+            QNetworkRequest request;
+            QNetworkReply* pReply = NULL;
+
+            request.setRawHeader( "Accept","application/json" );
+            request.setUrl( QUrl( "http://api.themoviedb.org/3/" + strSearchType + "/" + QString::number( iID ) +"/images?api_key=dc005c14d5fdaa914da77a1855473768" ) );
+
+            pReply = m_pNetworkManager->get( request );
+
+            uiQueryId = qHash( strQuery );
+            m_mQuery.insert( pReply, PQT( uiQueryId, DataImage_Get ) );
+        }
+
+        return uiQueryId;
+    }
+
+    uint MSSearchEngine_TMDB::getImage( const QString& _rstrImageName, eImageType _eImageType )
+    {
         QNetworkRequest request;
         QNetworkReply* pReply = NULL;
+
+        QString strImage;
+        switch( _eImageType )
+        {
+            case ICON :
+                strImage = "w92";
+            break;
+            case POSTER :
+                strImage = "w185";
+            break;
+            default :
+                strImage = "original";
+            break;
+        }
 
         request.setRawHeader( "Accept","application/json" );
         request.setUrl( QUrl( "http://cf2.imgobject.com/t/p/w185/" + _rstrImageName ) );
@@ -174,6 +239,30 @@ namespace Tools
                 }
             }
             break;
+            case Movie_Cast :
+            {
+                QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
+
+                if( bOk )
+                {
+                    QList< Data::MSMovieCast* > lpMovieCast;
+
+                    foreach( QVariant result, res[ "cast" ].toList() )
+                    {
+                        Data::MSMovieCast_TMDB* pMovieCast  = new Data::MSMovieCast_TMDB();
+                        QJson::QObjectHelper::qvariant2qobject( result.toMap(), pMovieCast );
+
+                        lpMovieCast.push_back( pMovieCast );
+                    }
+
+                    emit sigMovieCastFound( pairQueryType.first, lpMovieCast );
+                }
+                else
+                {
+                    qDebug()<< "parsing failed";
+                }
+            }
+            break;
             case Person_Search :
             {
                 QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
@@ -217,6 +306,52 @@ namespace Tools
                 }
             }
             break;
+            case DataImage_Get :
+            {
+                QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
+
+                if( bOk )
+                {
+                    QList< Data::MSDataImage* > lpResult;
+
+                    foreach( QVariant result, res[ "backdrops" ].toList() )
+                    {
+                        Data::MSDataImage_TMDB* pDataImage  = new Data::MSDataImage_TMDB();
+                        QJson::QObjectHelper::qvariant2qobject( result.toMap(), pDataImage );
+
+                        pDataImage->setImageType( Data::MSDataImage::BACKDROP );
+
+                        lpResult.push_back( pDataImage );
+                    }
+
+                    foreach( QVariant result, res[ "posters" ].toList() )
+                    {
+                        Data::MSDataImage_TMDB* pDataImage  = new Data::MSDataImage_TMDB();
+                        QJson::QObjectHelper::qvariant2qobject( result.toMap(), pDataImage );
+
+                        pDataImage->setImageType( Data::MSDataImage::POSTER );
+
+                        lpResult.push_back( pDataImage );
+                    }
+
+                    foreach( QVariant result, res[ "profiles" ].toList() )
+                    {
+                        Data::MSDataImage_TMDB* pDataImage  = new Data::MSDataImage_TMDB();
+                        QJson::QObjectHelper::qvariant2qobject( result.toMap(), pDataImage );
+
+                        pDataImage->setImageType( Data::MSDataImage::PROFILES );
+
+                        lpResult.push_back( pDataImage );
+                    }
+
+                    emit sigDataImagesFound( pairQueryType.first, lpResult );
+                }
+                else
+                {
+                    qDebug()<< "parsing failed";
+                }
+            }
+            break;
             case Image_Get :
             {
                 QPixmap* pPixmap = new QPixmap();
@@ -230,60 +365,3 @@ namespace Tools
         }
     }
 }
-
-//QNetworkRequest request;
-
-////        request.setUrl( QUrl( "http://api.themoviedb.org/3/authentication/token/new?api_key=dc005c14d5fdaa914da77a1855473768" ) );
-
-//request.setRawHeader( "Accept","application/json" );
-//request.setUrl( QUrl( "http://api.themoviedb.org/3/search/movie?api_key=dc005c14d5fdaa914da77a1855473768&query=" + strResearch ) );
-//QNetworkReply* reply = m_pNetworkManager->get( request );
-
-//    QHash< int, QString > MSSearchEngine::parseContentToResultList( const QByteArray& _rstrContent )
-//    {
-//        QHash< int, QString > hContent;
-
-//        QJson::Parser parser;
-//        bool bOk;
-
-//        qDebug() << _rstrContent;
-
-//        QVariantMap res = parser.parse( _rstrContent, &bOk ).toMap();
-//        if( bOk )
-//        {
-//            int i = 0;
-//            foreach( QVariant result, res[ "results" ].toList() )
-//            {
-//                hContent.insert( i, result.toMap()[ "original_title" ].toString() );
-//                ++i;
-//                hContent.insert( i, QString( "http://cf2.imgobject.com/t/p/w185" ) + result.toMap()[ "poster_path" ].toString() );
-//                ++i;
-//                hContent.insert( i, result.toMap()[ "id" ].toString() );
-//                ++i;
-
-//                qDebug() << result.toMap()[ "original_title" ].toString().toUtf8().constData();
-//            }
-//        }
-//        else
-//        {
-//            qDebug( "parsing failed" );
-//        }
-
-//        return hContent;
-//    }
-
-//    MSMovieInfo* MSSearchEngine::parseContentToMovie( const QByteArray& _rstrContent )
-//    {
-//        qDebug( "parsing movie" );
-
-//        MSMovieInfo_TMDB* pMovie  = new MSMovieInfo_TMDB();
-//        QJson::Parser   parser;
-//        bool            bOk;
-
-//        QVariantMap res = parser.parse( _rstrContent, &bOk ).toMap();
-//        QJson::QObjectHelper::qvariant2qobject( res, pMovie );
-
-//        qDebug( "parsing done" );
-
-//        return pMovie;
-//    }

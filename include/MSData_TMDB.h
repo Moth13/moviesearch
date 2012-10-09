@@ -6,6 +6,22 @@
 
 namespace Data
 {
+
+    class MSDataImage_TMDB : public MSDataImage
+    {
+            Q_OBJECT
+
+            Q_PROPERTY(QString file_path READ getImageFile WRITE setImageFile)
+            Q_PROPERTY(QString iso_639_1 READ getIso WRITE setIso)
+            Q_PROPERTY(float aspect_ratio READ getAspectRatio WRITE setAspectRatio)
+            Q_PROPERTY(int height READ getHeight WRITE setHeight)
+            Q_PROPERTY(int width READ getWidth WRITE setWidth)
+
+        public:
+            explicit MSDataImage_TMDB( QObject* parent = NULL ) : MSDataImage( parent ){ m_strClassName = "MSDataImage_TMDB"; }
+            ~MSDataImage_TMDB(){}
+    };
+
     class MSMovieInfo_TMDB: public MSMovieInfo
     {
             Q_OBJECT
@@ -25,6 +41,21 @@ namespace Data
         public :
             explicit MSMovieInfo_TMDB( QObject* parent = NULL ) : MSMovieInfo( parent ) { m_strClassName = "MSMovieInfo_TMDB"; }
             ~MSMovieInfo_TMDB(){}
+    };
+
+    class MSMovieCast_TMDB : public MSMovieCast
+    {
+            Q_OBJECT
+
+            Q_PROPERTY(QString character READ getCharacterName WRITE setCharacterName)
+            Q_PROPERTY(QString name READ getActorName WRITE setActorName)
+            Q_PROPERTY(QString profile_path READ getActorImage WRITE setActorImage)
+            Q_PROPERTY(int id READ getActorID WRITE setActorID)
+            Q_PROPERTY(int order READ getCastPos WRITE setCastPos)
+
+        public:
+            explicit MSMovieCast_TMDB( QObject* parent = NULL ) : MSMovieCast( parent ){ m_strClassName = "MSMovieCast_TMDB"; }
+            ~MSMovieCast_TMDB(){}
     };
 
     class MSPersonInfo_TMDB : public MSPersonInfo

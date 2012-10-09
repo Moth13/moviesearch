@@ -34,9 +34,15 @@ namespace Tools
                               , Qt::UniqueConnection );
 
             QObject::connect( this
-                              , SIGNAL( sigPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) )
+                              , SIGNAL( sigPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
                               , _xpMainWindow
-                              , SLOT( onPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) )
+                              , SLOT( onPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                              , _xpMainWindow
+                              , SLOT( onImageFound( uint, QPixmap* ) )
                               , Qt::UniqueConnection );
         }
     }
@@ -50,13 +56,25 @@ namespace Tools
             QObject::connect( this
                               , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
                               , _xpTabInfo
-                              , SLOT( onMovieBasicInfoFound( uint,Data::MSMovieInfo* ) )
+                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
+                              , _xpTabInfo
+                              , SLOT( onMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
                               , Qt::UniqueConnection );
 
             QObject::connect( this
                               , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
                               , _xpTabInfo
                               , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
+                              , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
+                              , _xpTabInfo
+                              , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) )
                               , Qt::UniqueConnection );
 
             QObject::connect( this
@@ -77,9 +95,14 @@ namespace Tools
                               , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) ) );
 
             QObject::disconnect( this
-                              , SIGNAL( sigPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) )
+                              , SIGNAL( sigPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
                               , _xpMainWindow
-                              , SLOT( onPersonsFromNameFound( uint , QList<Data::MSPersonSearchResult*> ) ) );
+                              , SLOT( onPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                              , _xpMainWindow
+                              , SLOT( onImageFound( uint, QPixmap* ) ) );
         }
     }
 
@@ -93,9 +116,19 @@ namespace Tools
                               , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
 
             QObject::disconnect( this
+                              , SIGNAL( sigMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
+                              , _xpTabInfo
+                              , SLOT( onMovieCastFound( uint, QList< Data::MSMovieCast* > ) ) );
+
+            QObject::disconnect( this
                               , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
                               , _xpTabInfo
                               , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
+                              , _xpTabInfo
+                              , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) ) );
 
             QObject::disconnect( this
                               , SIGNAL( sigImageFound( uint, QPixmap* ) )

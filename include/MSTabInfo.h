@@ -11,7 +11,7 @@
 #define MSTABINFO_H
 
 #include <QtCore>
-#include <QWidget>
+#include <QtGui>
 
 class MSImage;
 
@@ -28,7 +28,9 @@ namespace Tools
 namespace Data
 {
     class MSData;
+    class MSDataImage;
     class MSMovieInfo;
+    class MSMovieCast;
     class MSPersonInfo;
 }
 
@@ -62,7 +64,12 @@ namespace UI
             Data::MSData*               m_pData;
             Tools::MSSearchEngine*      m_xpSearchEngine;
             uint                        m_uiDataQueryID;
+            uint                        m_uiCastQueryID;
+            uint                        m_uiImagesQueryID;
+            QList< Data::MSMovieCast* > m_lpMovieCast;
+            QList< MSImage* >           m_lpImages;
             QMap< uint, MSImage* >      m_mQueryImage;
+            QMap< uint, QTableWidgetItem* > m_mQueryIcon;
             //------------------------------------------------------//
 
             //------------------------------------------------------//
@@ -73,10 +80,16 @@ namespace UI
         private slots :
             /*! sigMovieBasicInfoFound handler slot */
             void onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
+            /*! sigMovieCastFound handler slot */
+            void onMovieCastFound( uint _uiQueryID, QList< Data::MSMovieCast* > _lpMovie );
             /*! sigPersonBasicInfoFound handler slot */
             void onPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pPerson );
+            /*! sigDataImagesFound handler slot */
+            void onDataImagesFound( uint _uiQueryID, QList< Data::MSDataImage* > _lpDataImage );
             /*! sigImageFound handler slot */
             void onImageFound( uint _uiQueryID, QPixmap* _pPixmap );
+
+            void on_listView_doubleClicked(const QModelIndex &index);
     };
 }
 #endif // MSTABINFO_H

@@ -15,11 +15,15 @@
 
 namespace Data
 {
-    class MSMovieInfo;
-    class MSMovieSearchResult;
+    class MSData;
+    class MSDataImage;
 
-    class MSPersonInfo;
+    class MSMovieSearchResult;
+    class MSMovieInfo;
+    class MSMovieCast;
+
     class MSPersonSearchResult;
+    class MSPersonInfo;
 }
 
 namespace UI
@@ -80,6 +84,11 @@ namespace Tools
             \return a queryId
         */
         virtual uint getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult ) = 0;
+        /*!
+            Get, for a MSMovie, associate casting
+            \return a queryId
+        */
+        virtual uint getMovieCast( const Data::MSMovieInfo& _rMovie ) = 0;
 
         /*!
             Get all persons from a name
@@ -92,8 +101,14 @@ namespace Tools
         */
         virtual uint getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult ) = 0;
 
+
         /*!
-            Get basic information from a MSMMovieSearchResult
+            Get a data image
+            \return a queryId
+        */
+        virtual uint getDataImageFrom( const Data::MSData& _rMSData ) = 0;
+        /*!
+            Get an image
             \return a queryId
         */
         virtual uint getImage( const QString& _rstrImageName, eImageType _eImageType ) = 0;
@@ -106,11 +121,16 @@ namespace Tools
         void sigMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults );
         /*! Signal emitted when get basic movie info is completed */
         void sigMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
+        /*! Signal emitted when get movie cast is completed */
+        void sigMovieCastFound( uint _uiQueryID, QList< Data::MSMovieCast* > _lpMovie );
 
         /*! Signal emitted when get persons from name is completed */
         void sigPersonsFromNameFound( uint _uiQueryID, QList< Data::MSPersonSearchResult* > _lpResults );
         /*! Signal emitted when get basic movie info is completed */
         void sigPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pMovie );
+
+        /*! Signal emitted when get data image is completed */
+        void sigDataImagesFound( uint _uiQueryID, QList< Data::MSDataImage* > _lpDataImage );
 
         /*! Signal emitted when get image is completed */
         void sigImageFound( uint _uiQueryID, QPixmap* _pPixmap );
