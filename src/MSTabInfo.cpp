@@ -129,7 +129,7 @@ namespace UI
             {
                 uint uiQueryId = 0;
                 uiQueryId = m_xpSearchEngine->getImage( rPerson.getProfilePath(), Tools::MSSearchEngine::POSTER );
-                m_mQueryImage.insert( uiQueryId, m_pUI->TabInfo_Image_Label );
+                m_mQueryImage.insertMulti( uiQueryId, m_pUI->TabInfo_Image_Label );
             }
 
             qDebug() <<"Setting it done";
@@ -186,8 +186,8 @@ namespace UI
                 m_pUI->TabInfo_Cast->setItem( i, 0, pItemIcon );
                 m_pUI->TabInfo_Cast->setItem( i, 1, pItemCast );
 
-                QRect rect = m_pUI->TabInfo_Cast->fontMetrics().boundingRect( pItemCast->text() );
-                m_pUI->TabInfo_Cast->setColumnWidth( 1, std::max( m_pUI->TabInfo_Cast->columnWidth( 1 ), rect.width() ) );
+
+                m_pUI->TabInfo_Cast->setColumnWidth( 1, m_pUI->TabInfo_Cast->geometry().size().width() - m_pUI->TabInfo_Cast->columnWidth( 0 ) - 25 );
 
                 if( NULL != m_xpSearchEngine )
                 {
@@ -234,7 +234,7 @@ namespace UI
                 if( NULL != m_xpSearchEngine )
                 {
                     uint uiQueryId = m_xpSearchEngine->getImage( pDataImage->getImageFile(), Tools::MSSearchEngine::POSTER );
-                    m_mQueryImage.insert( uiQueryId, pImage );
+                    m_mQueryImage.insertMulti( uiQueryId, pImage );
                 }
                 m_lpImages.push_back( pImage );
                 ++i;
@@ -256,11 +256,16 @@ namespace UI
             && NULL != _pPixmap )
         {
             m_mQueryIcon[ _uiQueryID ]->setIcon( QIcon( *_pPixmap ) );
+            m_mQueryImage.take( _uiQueryID );
         }
     }
 
-    void MSTabInfo::on_listView_doubleClicked( const QModelIndex &index )
+    void MSTabInfo::on_TabInfo_Cast_cellDoubleClicked(int row, int /*column*/)
     {
-
+//        if( NULL != m_xpSearchEngine )
+//        {
+//            m_xpSearchEngine->get
+//        }
+//        m_lpMovieCast[ row ];
     }
 }

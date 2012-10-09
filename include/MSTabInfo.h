@@ -89,7 +89,7 @@ namespace UI
             /*! sigImageFound handler slot */
             void onImageFound( uint _uiQueryID, QPixmap* _pPixmap );
 
-            void on_listView_doubleClicked(const QModelIndex &index);
+            void on_TabInfo_Cast_cellDoubleClicked(int row, int column);
     };
 }
 #endif // MSTABINFO_H

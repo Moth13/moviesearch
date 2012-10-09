@@ -41,16 +41,15 @@ void MSImage::onStartAnimation()
     if( NULL == s_pQMovie )
     {
         s_pQMovie = new QMovie( "../../../resources/waiting.gif" );
+        s_pQMovie->start();
     }
     ++s_iNbUsed;
 
     setMovie( s_pQMovie );
-    s_pQMovie->start();
 }
 
 void MSImage::onPixmapReceived( const QPixmap& _rPixmap )
 {
-    s_pQMovie->stop();
     setScaledContents( true );
     setPixmap( _rPixmap );
 }
