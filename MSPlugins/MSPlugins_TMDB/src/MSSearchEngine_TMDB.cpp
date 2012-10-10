@@ -45,6 +45,7 @@ namespace Tools
 
     uint MSSearchEngine_TMDB::getMoviesFromTitle( const QString& _rstrTitle )
     {
+        AUTOLOG
         QNetworkRequest request;
         QNetworkReply* pReply = NULL;
 
@@ -61,6 +62,7 @@ namespace Tools
 
     uint MSSearchEngine_TMDB::getBasicMovieInfo( const Data::MSMovieSearchResult& _rMovieSearchResult )
     {
+        AUTOLOG
         QNetworkRequest request;
         QNetworkReply* pReply = NULL;
 
@@ -207,6 +209,7 @@ namespace Tools
 
     void MSSearchEngine_TMDB::onNetworkManagerReply( QNetworkReply* _pReply )
     {
+        AUTOLOG
         PQT pairQueryType = m_mQuery[ _pReply ];
         QJson::Parser parser;
         bool bOk;

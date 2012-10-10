@@ -95,6 +95,7 @@ namespace UI
 
     void MSMainWindow::onMoviesFromTitleFound( uint _uiQueryID, QList< Data::MSMovieSearchResult* > _lpResults )
     {
+        AUTOLOG
         if( m_uiLastQueryID == _uiQueryID )
         {
             m_pUI->statusBar->showMessage( QObject::tr( "Results found!!" ) );
@@ -105,6 +106,7 @@ namespace UI
 
             for( int i = 0; i<_lpResults.size(); i++ )
             {
+                AUTOLOG
                 m_mDataSearchResult.insert( _lpResults[ i ]->getName(), _lpResults[ i ] );
 
                 QStandardItem* pItem = new QStandardItem( "" );
@@ -115,6 +117,7 @@ namespace UI
                 uint uiQueryId = m_xpCurrentSearchEngine->getImage( _lpResults[ i ]->getPoster(), Tools::MSSearchEngine::ICON );
                 m_mQueryImage.insert( uiQueryId, pItem );
             }
+            AUTOLOG
             m_pCompleter->complete();
             m_pCompleter->setCurrentRow( 0 );
         }
@@ -233,6 +236,7 @@ namespace UI
 
         if( NULL != m_xpCurrentSearchEngine )
         {
+            AUTOLOG
             QString strResearch = m_pUI->SearchFor_TextEdit->text();
 
 //            if( !strResearch.isEmpty() )
