@@ -42,6 +42,11 @@ namespace Tools
             \return a queryId
         */
         virtual uint getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult );
+        /*!
+            Get credits for a personn
+            \return a queryId
+        */
+        virtual uint getPersonCredits( const Data::MSPersonInfo& _rPerson );
 
         /*!
             Get a data image
@@ -66,8 +71,11 @@ namespace Tools
         {   Movie_Search = 0
         ,   Movie_Info
         ,   Movie_Cast
+
         ,   Person_Search
         ,   Person_Info
+        ,   Person_Credits
+
         ,   DataImage_Get
         ,   Image_Get
         };

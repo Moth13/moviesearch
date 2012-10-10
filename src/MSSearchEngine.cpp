@@ -72,6 +72,12 @@ namespace Tools
                               , Qt::UniqueConnection );
 
             QObject::connect( this
+                              , SIGNAL( sigPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
+                              , _xpTabInfo
+                              , SLOT( onPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( this
                               , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
                               , _xpTabInfo
                               , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) )
@@ -124,6 +130,11 @@ namespace Tools
                               , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
                               , _xpTabInfo
                               , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) ) );
+
+            QObject::disconnect( this
+                              , SIGNAL( sigPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
+                              , _xpTabInfo
+                              , SLOT( onPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) ) );
 
             QObject::disconnect( this
                               , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )

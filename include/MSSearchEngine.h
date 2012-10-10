@@ -24,6 +24,7 @@ namespace Data
 
     class MSPersonSearchResult;
     class MSPersonInfo;
+    class MSPersonCredits;
 }
 
 namespace UI
@@ -100,6 +101,11 @@ namespace Tools
             \return a queryId
         */
         virtual uint getBasicPersonInfo( const Data::MSPersonSearchResult& _rPersonSearchResult ) = 0;
+        /*!
+            Get credits for a personn
+            \return a queryId
+        */
+        virtual uint getPersonCredits( const Data::MSPersonInfo& _rPerson ) = 0;
 
 
         /*!
@@ -128,6 +134,8 @@ namespace Tools
         void sigPersonsFromNameFound( uint _uiQueryID, QList< Data::MSPersonSearchResult* > _lpResults );
         /*! Signal emitted when get basic movie info is completed */
         void sigPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pMovie );
+        /*! Signal emitted when get person credits is completed */
+        void sigPersonCreditsFound( uint _uiQueryID, QList< Data::MSPersonCredits* > _lpMovie );
 
         /*! Signal emitted when get data image is completed */
         void sigDataImagesFound( uint _uiQueryID, QList< Data::MSDataImage* > _lpDataImage );

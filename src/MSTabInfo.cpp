@@ -25,6 +25,9 @@ namespace UI
         ,   m_pData             ( NULL )
         ,   m_xpSearchEngine    ( NULL )
         ,   m_uiDataQueryID     ( 0 )
+        ,   m_uiCastQueryID     ( 0 )
+        ,   m_uiCreditsQueryID  ( 0 )
+        ,   m_uiImagesQueryID   ( 0 )
     {
         m_pUI->setupUi( this );
     }
@@ -130,6 +133,9 @@ namespace UI
                 uint uiQueryId = 0;
                 uiQueryId = m_xpSearchEngine->getImage( rPerson.getProfilePath(), Tools::MSSearchEngine::POSTER );
                 m_mQueryImage.insertMulti( uiQueryId, m_pUI->TabInfo_Image_Label );
+
+                m_uiCreditsQueryID  = m_xpSearchEngine->getPersonCredits( rPerson );
+                m_uiImagesQueryID   = m_xpSearchEngine->getDataImageFrom( rPerson );
             }
 
             qDebug() <<"Setting it done";
@@ -205,6 +211,45 @@ namespace UI
             && NULL != _pPerson )
         {
             setContent( *_pPerson );
+        }
+    }
+
+    void MSTabInfo::onPersonCreditsFound( uint _uiQueryID, QList< Data::MSPersonCredits* > _lpPersonCredits )
+    {
+        if( m_uiCreditsQueryID == _uiQueryID )
+        {
+            // clear old list
+            while( !m_lpPersonCredits.isEmpty() )
+            {
+                delete m_lpPersonCredits.takeLast();
+            }
+            Q_ASSERT( m_lpPersonCredits.isEmpty() );
+
+            m_lpPersonCredits = _lpPersonCredits;
+
+            m_pUI->TabInfo_Cast->clear();
+            m_pUI->TabInfo_Cast->setRowCount( m_lpPersonCredits.size() );
+            m_pUI->TabInfo_Cast->setColumnCount( 2 );
+            m_mQueryIcon.clear();
+
+            int i = 0;
+            foreach( Data::MSPersonCredits* pMSPersonCredits, m_lpPersonCredits )
+            {
+                QTableWidgetItem* pItemChar = new QTableWidgetItem();
+                QTableWidgetItem* pItemIcon = new QTableWidgetItem();
+                pItemChar->setText( pMSPersonCredits->getCharacterName() + QObject::tr( " in " ) + pMSPersonCredits->getMovieTitle() );
+                m_pUI->TabInfo_Cast->setItem( i, 0, pItemIcon );
+                m_pUI->TabInfo_Cast->setItem( i, 1, pItemChar );
+
+                m_pUI->TabInfo_Cast->setColumnWidth( 1, m_pUI->TabInfo_Cast->geometry().size().width() - m_pUI->TabInfo_Cast->columnWidth( 0 ) - 25 );
+
+                if( NULL != m_xpSearchEngine )
+                {
+                    uint uiQueryId = m_xpSearchEngine->getImage( pMSPersonCredits->getMoviePosterPath(), Tools::MSSearchEngine::ICON );
+                    m_mQueryIcon.insert( uiQueryId, pItemIcon );
+                }
+                ++i;
+            }
         }
     }
 

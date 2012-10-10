@@ -228,6 +228,7 @@ namespace UI
 
     void MSMainWindow::on_SearchFor_TextEdit_textEdited( const QString &arg1 )
     {
+        AUTOLOG
         m_pCompleter->complete();
 
         if( NULL != m_xpCurrentSearchEngine )

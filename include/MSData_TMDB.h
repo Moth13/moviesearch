@@ -74,6 +74,22 @@ namespace Data
             explicit MSPersonInfo_TMDB( QObject* parent = NULL ) : MSPersonInfo( parent ){ m_strClassName = "MSPersonInfo_TMDB"; }
             ~MSPersonInfo_TMDB(){}
     };
+
+    class MSPersonCredits_TMDB : public MSPersonCredits
+    {
+            Q_OBJECT
+
+            Q_PROPERTY(QString character READ getCharacterName WRITE setCharacterName)
+            Q_PROPERTY(QString original_title READ getMovieOriTitle WRITE setMovieOriTitle)
+            Q_PROPERTY(QString poster_path READ getMoviePosterPath WRITE setMovePosterPath)
+            Q_PROPERTY(QString title READ getMovieTitle WRITE setMovieTitle)
+            Q_PROPERTY(QDate release_date READ getMovieReleaseDate WRITE setMovieReleaseDate)
+            Q_PROPERTY(int id READ getMovieID WRITE setMovieID)
+
+        public:
+            explicit MSPersonCredits_TMDB( QObject* parent = NULL ) : MSPersonCredits( parent ){ m_strClassName = "MSPersonCredits_TMDB"; }
+            ~MSPersonCredits_TMDB(){}
+    };
 }
 
 #endif // MSDATA_TMDB_H

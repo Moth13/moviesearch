@@ -29,9 +29,12 @@ namespace Data
 {
     class MSData;
     class MSDataImage;
+
     class MSMovieInfo;
     class MSMovieCast;
+
     class MSPersonInfo;
+    class MSPersonCredits;
 }
 
 namespace UI
@@ -60,15 +63,17 @@ namespace UI
         private:
             //------------------------------------------------------//
             // Attributs
-            Ui::MSTabInfo*              m_pUI;
-            Data::MSData*               m_pData;
-            Tools::MSSearchEngine*      m_xpSearchEngine;
-            uint                        m_uiDataQueryID;
-            uint                        m_uiCastQueryID;
-            uint                        m_uiImagesQueryID;
-            QList< Data::MSMovieCast* > m_lpMovieCast;
-            QList< MSImage* >           m_lpImages;
-            QMap< uint, MSImage* >      m_mQueryImage;
+            Ui::MSTabInfo*                  m_pUI;
+            Data::MSData*                   m_pData;
+            Tools::MSSearchEngine*          m_xpSearchEngine;
+            uint                            m_uiDataQueryID;
+            uint                            m_uiCastQueryID;
+            uint                            m_uiCreditsQueryID;
+            uint                            m_uiImagesQueryID;
+            QList< Data::MSMovieCast* >     m_lpMovieCast;
+            QList< Data::MSPersonCredits* > m_lpPersonCredits;
+            QList< MSImage* >               m_lpImages;
+            QMap< uint, MSImage* >          m_mQueryImage;
             QMap< uint, QTableWidgetItem* > m_mQueryIcon;
             //------------------------------------------------------//
 
@@ -82,8 +87,12 @@ namespace UI
             void onMovieBasicInfoFound( uint _uiQueryID, Data::MSMovieInfo* _pMovie );
             /*! sigMovieCastFound handler slot */
             void onMovieCastFound( uint _uiQueryID, QList< Data::MSMovieCast* > _lpMovie );
+
             /*! sigPersonBasicInfoFound handler slot */
             void onPersonBasicInfoFound( uint _uiQueryID, Data::MSPersonInfo* _pPerson );
+            /*! sigPersonCreditsFound handler slot */
+            void onPersonCreditsFound( uint _uiQueryID, QList< Data::MSPersonCredits* > _lpPersonCredits );
+
             /*! sigDataImagesFound handler slot */
             void onDataImagesFound( uint _uiQueryID, QList< Data::MSDataImage* > _lpDataImage );
             /*! sigImageFound handler slot */

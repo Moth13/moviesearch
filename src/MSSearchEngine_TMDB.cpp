@@ -123,6 +123,22 @@ namespace Tools
         return uiQueryId;
     }
 
+    uint MSSearchEngine_TMDB::getPersonCredits( const Data::MSPersonInfo& _rPerson )
+    {
+        QNetworkRequest request;
+        QNetworkReply* pReply = NULL;
+
+        request.setRawHeader( "Accept","application/json" );
+        request.setUrl( QUrl( "http://api.themoviedb.org/3/person/" + QString::number( _rPerson.getId() ) +"/credits" +"?api_key=dc005c14d5fdaa914da77a1855473768" ) );
+
+        pReply = m_pNetworkManager->get( request );
+
+        uint uiQueryId = qHash( _rPerson.getName() );
+        m_mQuery.insert( pReply, PQT( uiQueryId, Person_Credits ) );
+
+        return uiQueryId;
+    }
+
     uint MSSearchEngine_TMDB::getDataImageFrom( const Data::MSData& _rMSData )
     {
         QString strQuery;
@@ -299,6 +315,31 @@ namespace Tools
                     QJson::QObjectHelper::qvariant2qobject( res, pPerson );
 
                     emit sigPersonBasicInfoFound( pairQueryType.first, pPerson );
+                }
+                else
+                {
+                    qDebug()<< "parsing failed";
+                }
+            }
+            break;
+            case Person_Credits :
+            {
+                QVariantMap res = parser.parse( _pReply->readAll(), &bOk ).toMap();
+
+                if( bOk )
+                {
+                    QList< Data::MSPersonCredits* > lpResult;
+
+                    foreach( QVariant result, res[ "cast" ].toList() )
+                    {
+                        Data::MSPersonCredits_TMDB* pPersonCredits = new Data::MSPersonCredits_TMDB();
+                        QJson::QObjectHelper::qvariant2qobject( result.toMap(), pPersonCredits );
+                        lpResult.push_back( pPersonCredits );
+                    }
+                    qSort( lpResult.begin(), lpResult.end(), Data::MSPersonCredits::reclentlier );
+
+
+                    emit sigPersonCreditsFound( pairQueryType.first, lpResult );
                 }
                 else
                 {
