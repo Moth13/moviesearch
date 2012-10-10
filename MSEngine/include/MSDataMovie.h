@@ -11,11 +11,12 @@
 #define MSDATAMOVIE_H
 
 #include <MSData.h>
+#include <MSEngineExport.h>
 
 namespace Data
 {
     /*! \class Describing search result movie*/
-    class MSMovieSearchResult : public MSData
+    class MSEngine_EXPORT MSMovieSearchResult : public MSData
     {
         public:
             explicit MSMovieSearchResult( QObject* parent = NULL ) : MSData( parent ){ m_strClassName = "MSMovieSearchResult"; }
@@ -79,7 +80,7 @@ namespace Data
     };
 
     /*! \class Describing basic movie info*/
-    class MSMovieInfo: public MSData
+    class MSEngine_EXPORT MSMovieInfo: public MSData
     {
         public:
             explicit MSMovieInfo( QObject* parent = NULL ) : MSData( parent ) { m_strClassName = "MSMovieInfo"; }
@@ -195,7 +196,7 @@ namespace Data
     };
 
     /*! \class Describing movie cast*/
-    class MSMovieCast: public MSData
+    class MSEngine_EXPORT MSMovieCast: public MSData
     {
         public:
             explicit MSMovieCast( QObject* parent = NULL ) : MSData( parent ) { m_strClassName = "MSMovieCast"; }

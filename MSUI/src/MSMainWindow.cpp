@@ -55,8 +55,6 @@ namespace UI
         m_pCompleter->setCompletionMode( QCompleter::UnfilteredPopupCompletion );
         m_pCompleter->setModelSorting( QCompleter::CaseSensitivelySortedModel );
         m_pCompleter->setCaseSensitivity( Qt::CaseInsensitive );
-
-        on_SearchFor_TextEdit_textEdited( "" );
     }
 
     MSMainWindow::~MSMainWindow()
@@ -71,14 +69,43 @@ namespace UI
     {
         if( NULL != m_xpCurrentSearchEngine )
         {
-            m_xpCurrentSearchEngine->doDisconnection( this );
+            QObject::disconnect( m_xpCurrentSearchEngine
+                                 , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                                 , this
+                                 , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) ) );
+
+            QObject::disconnect( m_xpCurrentSearchEngine
+                                 , SIGNAL( sigPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
+                                 , this
+                                 , SLOT( onPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) ) );
+
+            QObject::disconnect( m_xpCurrentSearchEngine
+                                 , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                                 , this
+                                 , SLOT( onImageFound( uint, QPixmap* ) ) );
         }
 
         m_xpCurrentSearchEngine = _pSearchEngine;
 
         if( NULL != _pSearchEngine )
         {
-            m_xpCurrentSearchEngine->doConnection( this );
+            QObject::connect( m_xpCurrentSearchEngine
+                              , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                              , this
+                              , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpCurrentSearchEngine
+                              , SIGNAL( sigPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
+                              , this
+                              , SLOT( onPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpCurrentSearchEngine
+                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                              , this
+                              , SLOT( onImageFound( uint, QPixmap* ) )
+                              , Qt::UniqueConnection );
         }
     }
 
@@ -169,7 +196,7 @@ namespace UI
         {
             MSTabInfo* pTab         = new MSTabInfo();
 
-            m_xpCurrentSearchEngine->doConnection( pTab );
+            pTab->setSearchEngine( m_xpCurrentSearchEngine );
 
             m_pUI->lTabInfo_Widget->addTab( pTab, strResearch );
             m_pUI->lTabInfo_Widget->setCurrentIndex( m_lpTabsInfo.size() );

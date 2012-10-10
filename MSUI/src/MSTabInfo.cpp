@@ -34,10 +34,7 @@ namespace UI
 
     MSTabInfo::~MSTabInfo()
     {
-        if( NULL != m_xpSearchEngine )
-        {
-            m_xpSearchEngine->doDisconnection( this );
-        }
+        setSearchEngine( NULL );
 
         if( m_pData )
         {
@@ -69,7 +66,79 @@ namespace UI
 
     void MSTabInfo::setSearchEngine( Tools::MSSearchEngine* _xpSearchEngine )
     {
+        if( NULL != m_xpSearchEngine )
+        {
+            QObject::disconnect( m_xpSearchEngine
+                                 , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
+                                 , this
+                                 , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
+
+            QObject::disconnect( m_xpSearchEngine
+                                 , SIGNAL( sigMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
+                                 , this
+                                 , SLOT( onMovieCastFound( uint, QList< Data::MSMovieCast* > ) ) );
+
+            QObject::disconnect( m_xpSearchEngine
+                                 , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
+                                 , this
+                                 , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) ) );
+
+            QObject::disconnect( m_xpSearchEngine
+                                 , SIGNAL( sigPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
+                                 , this
+                                 , SLOT( onPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) ) );
+
+            QObject::disconnect( m_xpSearchEngine
+                                 , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
+                                 , this
+                                 , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) ) );
+
+            QObject::disconnect( m_xpSearchEngine
+                                 , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                                 , this
+                                 , SLOT( onImageFound( uint, QPixmap* ) ) );
+        }
+
         m_xpSearchEngine = _xpSearchEngine;
+
+        if( NULL != m_xpSearchEngine )
+        {
+            QObject::connect( m_xpSearchEngine
+                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
+                              , this
+                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpSearchEngine
+                              , SIGNAL( sigMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
+                              , this
+                              , SLOT( onMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpSearchEngine
+                              , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
+                              , this
+                              , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpSearchEngine
+                              , SIGNAL( sigPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
+                              , this
+                              , SLOT( onPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpSearchEngine
+                              , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
+                              , this
+                              , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) )
+                              , Qt::UniqueConnection );
+
+            QObject::connect( m_xpSearchEngine
+                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
+                              , this
+                              , SLOT( onImageFound( uint, QPixmap* ) )
+                              , Qt::UniqueConnection );
+        }
     }
 
     void MSTabInfo::setContent( const Data::MSData& rMSData )

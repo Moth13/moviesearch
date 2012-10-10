@@ -11,11 +11,12 @@
 #define MSDATA_H
 
 #include <QtCore>
+#include <MSEngineExport.h>
 
 namespace Data
 {
     /*! \class Describing main MSData*/
-    class MSData : public QObject
+    class MSEngine_EXPORT MSData : public QObject
     {
         public:
             explicit MSData( QObject* parent = NULL ) : QObject( parent ), m_strClassName( "MSData" ){}
@@ -40,7 +41,7 @@ namespace Data
             QString m_strClassName;
     };
     /*! \class Describing image*/
-    class MSDataImage: public MSData
+    class MSEngine_EXPORT MSDataImage: public MSData
     {
         public:
             enum eImageType

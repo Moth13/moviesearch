@@ -13,6 +13,7 @@ namespace Tools
     {
         friend class MSSearchEngineManager;
         Q_OBJECT
+        Q_INTERFACES( Tools::MSSearchEngine )
     public :
         //------------------------------------------------------//
         // Search functions
@@ -59,7 +60,7 @@ namespace Tools
         */
         virtual uint getImage( const QString& _rstrImageName, eImageType _eImageType );
         //------------------------------------------------------//
-    protected :
+//    public :
         /*! Constructor */
         MSSearchEngine_TMDB();
         /*! Destructor */

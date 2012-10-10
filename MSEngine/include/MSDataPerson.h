@@ -11,11 +11,12 @@
 #define MSDATAPERSON_H
 
 #include <MSData.h>
+#include <MSEngineExport.h>
 
 namespace Data
 {
     /*! \class Describing search result movie*/
-    class MSPersonSearchResult : public MSData
+    class MSEngine_EXPORT MSPersonSearchResult : public MSData
     {
         public:
             explicit MSPersonSearchResult( QObject* parent = NULL ) : MSData( parent ){ m_strClassName = "MSPersonSearchResult"; }
@@ -79,7 +80,7 @@ namespace Data
     };
 
     /*! \class Describing basic person info*/
-    class MSPersonInfo : public MSData
+    class MSEngine_EXPORT MSPersonInfo : public MSData
     {
         public:
             explicit MSPersonInfo( QObject* parent = NULL ) : MSData( parent ){ m_strClassName = "MSPersonInfo"; }
@@ -166,7 +167,7 @@ namespace Data
     };
 
     /*! \class Describing filmography*/
-    class MSPersonCredits: public MSData
+    class MSEngine_EXPORT MSPersonCredits: public MSData
     {
         public:
             explicit MSPersonCredits( QObject* parent = NULL ) : MSData( parent ) { m_strClassName = "MSPersonCredits"; }

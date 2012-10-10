@@ -6,7 +6,6 @@
 
 namespace Data
 {
-
     class MSDataImage_TMDB : public MSDataImage
     {
             Q_OBJECT

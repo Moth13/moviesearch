@@ -12,6 +12,7 @@
 
 #include <QtCore>
 #include <QPixmap>
+#include <MSEngineExport.h>
 
 namespace Data
 {
@@ -27,16 +28,10 @@ namespace Data
     class MSPersonCredits;
 }
 
-namespace UI
-{
-    class MSMainWindow;
-    class MSTabInfo;
-}
-
 namespace Tools
 {
     /*! \class Describing a search engine */
-    class MSSearchEngine : public QObject
+    class MSEngine_EXPORT MSSearchEngine : public QObject
     {
         Q_OBJECT
         friend class MSSearchEngineManager;
@@ -66,11 +61,11 @@ namespace Tools
 
         //------------------------------------------------------//
         // Tools function
-        void doConnection( UI::MSMainWindow* _xpMainWindow = NULL );
-        void doConnection( UI::MSTabInfo* _xpTabInfo = NULL );
+//        void doConnection( UI::MSMainWindow* _xpMainWindow = NULL );
+//        void doConnection( UI::MSTabInfo* _xpTabInfo = NULL );
 
-        void doDisconnection( UI::MSMainWindow* _xpMainWindow = NULL );
-        void doDisconnection( UI::MSTabInfo* _xpTabInfo = NULL );
+//        void doDisconnection( UI::MSMainWindow* _xpMainWindow = NULL );
+//        void doDisconnection( UI::MSTabInfo* _xpTabInfo = NULL );
         //------------------------------------------------------//
 
         //------------------------------------------------------//
@@ -144,7 +139,7 @@ namespace Tools
         void sigImageFound( uint _uiQueryID, QPixmap* _pPixmap );
         //------------------------------------------------------//
 
-    protected :
+    public :
         /*! Constructor */
         MSSearchEngine();
         /*! Destructor */
@@ -173,5 +168,6 @@ namespace Tools
         static QList< MSSearchEngine* > s_lpSearchEngine;
     };
 }
+Q_DECLARE_INTERFACE( Tools::MSSearchEngine, "Mon programme.Animal" )
 
 #endif // MSSEARCHENGINE_H

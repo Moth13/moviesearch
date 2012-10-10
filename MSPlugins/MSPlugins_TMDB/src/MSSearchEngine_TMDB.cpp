@@ -409,3 +409,5 @@ namespace Tools
         }
     }
 }
+
+Q_EXPORT_PLUGIN2( MSPlugins_TMDB, Tools::MSSearchEngine_TMDB )

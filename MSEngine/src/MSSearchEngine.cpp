@@ -3,11 +3,6 @@
 #include <MSDataMovie.h>
 #include <MSDataPerson.h>
 
-#include <MSMainWindow.h>
-#include <MSTabInfo.h>
-
-#include <MSSearchEngine_TMDB.h>
-
 namespace Tools
 {
     MSSearchEngine::MSSearchEngine()
@@ -23,133 +18,6 @@ namespace Tools
         delete m_pPixIcon;
     }
 
-    void MSSearchEngine::doConnection( UI::MSMainWindow* _xpMainWindow )
-    {
-        if( NULL != _xpMainWindow )
-        {
-            QObject::connect( this
-                              , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
-                              , _xpMainWindow
-                              , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
-                              , _xpMainWindow
-                              , SLOT( onPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
-                              , _xpMainWindow
-                              , SLOT( onImageFound( uint, QPixmap* ) )
-                              , Qt::UniqueConnection );
-        }
-    }
-
-    void MSSearchEngine::doConnection( UI::MSTabInfo* _xpTabInfo )
-    {
-        if( NULL != _xpTabInfo )
-        {
-            _xpTabInfo->setSearchEngine( this );
-
-            QObject::connect( this
-                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
-                              , _xpTabInfo
-                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
-                              , _xpTabInfo
-                              , SLOT( onMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
-                              , _xpTabInfo
-                              , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
-                              , _xpTabInfo
-                              , SLOT( onPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
-                              , _xpTabInfo
-                              , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) )
-                              , Qt::UniqueConnection );
-
-            QObject::connect( this
-                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
-                              , _xpTabInfo
-                              , SLOT( onImageFound( uint, QPixmap* ) )
-                              , Qt::UniqueConnection );
-        }
-    }
-
-    void MSSearchEngine::doDisconnection( UI::MSMainWindow* _xpMainWindow )
-    {
-        if( NULL != _xpMainWindow )
-        {
-            QObject::disconnect( this
-                              , SIGNAL( sigMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) )
-                              , _xpMainWindow
-                              , SLOT( onMoviesFromTitleFound( uint, QList<Data::MSMovieSearchResult*> ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) )
-                              , _xpMainWindow
-                              , SLOT( onPersonsFromNameFound( uint, QList<Data::MSPersonSearchResult*> ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
-                              , _xpMainWindow
-                              , SLOT( onImageFound( uint, QPixmap* ) ) );
-        }
-    }
-
-    void MSSearchEngine::doDisconnection( UI::MSTabInfo* _xpTabInfo )
-    {
-        if( NULL != _xpTabInfo )
-        {
-            QObject::disconnect( this
-                              , SIGNAL( sigMovieBasicInfoFound( uint, Data::MSMovieInfo* ) )
-                              , _xpTabInfo
-                              , SLOT( onMovieBasicInfoFound( uint, Data::MSMovieInfo* ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigMovieCastFound( uint, QList< Data::MSMovieCast* > ) )
-                              , _xpTabInfo
-                              , SLOT( onMovieCastFound( uint, QList< Data::MSMovieCast* > ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigPersonBasicInfoFound( uint, Data::MSPersonInfo* ) )
-                              , _xpTabInfo
-                              , SLOT( onPersonBasicInfoFound( uint, Data::MSPersonInfo* ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) )
-                              , _xpTabInfo
-                              , SLOT( onPersonCreditsFound( uint, QList<Data::MSPersonCredits*> ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigDataImagesFound( uint, QList< Data::MSDataImage* > ) )
-                              , _xpTabInfo
-                              , SLOT( onDataImagesFound( uint, QList< Data::MSDataImage* > ) ) );
-
-            QObject::disconnect( this
-                              , SIGNAL( sigImageFound( uint, QPixmap* ) )
-                              , _xpTabInfo
-                              , SLOT( onImageFound( uint, QPixmap* ) ) );
-
-            _xpTabInfo->setSearchEngine( NULL );
-        }
-    }
-
     QList< MSSearchEngine* > MSSearchEngineManager::s_lpSearchEngine = QList< MSSearchEngine* >();
 
     QList< MSSearchEngine* > MSSearchEngineManager::getAllSearchEngine()
@@ -159,9 +27,28 @@ namespace Tools
 
     void MSSearchEngineManager::loadAllSearchEngines()
     {
-        s_lpSearchEngine.push_back( new Tools::MSSearchEngine_TMDB() );
-        s_lpSearchEngine.push_back( new Tools::MSSearchEngine_TMDB() );
-        s_lpSearchEngine.push_back( new Tools::MSSearchEngine_TMDB() );
+        QDir pluginDir  = QDir( "/home/jguerinel/work/perso/m13moviesearch/build/debug/plugins" );
+
+        foreach( QString file, pluginDir.entryList( QDir::Files ) )
+        {
+            qDebug() << "test " << pluginDir.absoluteFilePath( file );
+            QPluginLoader loader( pluginDir.absoluteFilePath( file ) );
+            loader.setLoadHints(QLibrary::ResolveAllSymbolsHint);
+            QObject* pPlugin = loader.instance();
+
+            qDebug() << loader.errorString();
+            if( NULL != pPlugin )
+            {
+                qDebug() << "test";
+                MSSearchEngine* pSearchEngine = static_cast< MSSearchEngine* >( pPlugin );
+                s_lpSearchEngine.push_back( pSearchEngine );
+                qDebug() << pSearchEngine->getName();
+            }
+            else
+            {
+                qDebug() << "Failed to load a plugin!!!";
+            }
+        }
     }
 
     void MSSearchEngineManager::unloadSearchEngines()
