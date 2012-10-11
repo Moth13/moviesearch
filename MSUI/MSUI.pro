@@ -33,10 +33,6 @@ LIBS        += -L./lib -lMSEngine
 
 DEPENDPATH  += ../build/$$OUT_DIR/lib
 
-DEPENDPATH  += ./plugins/resources/qjson/lib
-unix:LIBS   += -L./plugins/resources/qjson/lib -lqjson
-win32:LIBS  += -L./plugins/resources/qjson/lib -lqjson0
-
 HEADERS     +=  \
     include/MSImage.h \
     include/MSTabInfo.h \

@@ -32,6 +32,8 @@ namespace Tools
         foreach( QString file, pluginDir.entryList( QDir::Files ) )
         {
             qDebug() << "test " << pluginDir.absoluteFilePath( file );
+            QLibrary lib( "/home/jguerinel/work/perso/m13moviesearch/build/debug/plugins/resources/qjson/lib/libqjson.so" );
+            lib.load();
             QPluginLoader loader( pluginDir.absoluteFilePath( file ) );
             loader.setLoadHints(QLibrary::ResolveAllSymbolsHint);
             QObject* pPlugin = loader.instance();

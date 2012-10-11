@@ -30,13 +30,13 @@ INCLUDEPATH += ./resources/qjson/include
 INCLUDEPATH += $$PWD/../../build/$$OUT_DIR/include
 
 #To be changed
-unix:LIBS   += -L$$PWD/resources/qjson/lib -lqjson
-win32:LIBS  += -L$$PWD/resources/qjson/lib -lqjson0
+unix:LIBS   += -L./resources/qjson/lib -lqjson
+win32:LIBS  += -L./resources/qjson/lib -lqjson0
 
-LIBS        += -L$$PWD/../../build/$$OUT_DIR/lib -lMSEngine
+LIBS        += -L./../../build/$$OUT_DIR/lib -lMSEngine
 
-DEPENDPATH  += $$PWD/resources/qjson/lib
-DEPENDPATH  += $$PWD/../../build/$$OUT_DIR/lib
+DEPENDPATH  += ./resources/qjson/lib
+DEPENDPATH  += ./../../build/$$OUT_DIR/lib
 
 HEADERS     +=  \
     include/MSData_TMDB.h \
