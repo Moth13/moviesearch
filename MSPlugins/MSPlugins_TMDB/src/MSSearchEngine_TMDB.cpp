@@ -19,12 +19,11 @@
 
 namespace Tools
 {
-
     MSSearchEngine_TMDB::MSSearchEngine_TMDB()
         :   MSSearchEngine      ( )
         ,   m_pNetworkManager   ( NULL )
     {
-        m_strPixIconName    = "../../../resources/tmdb-logo.png";
+        m_strPixIconName    = "./plugins/resources/tmdb-logo.png";
         m_strName           = "TMDB";
 
         m_pNetworkManager   = new QNetworkAccessManager( this );

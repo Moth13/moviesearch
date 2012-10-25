@@ -46,9 +46,12 @@ SOURCES     +=  \
     src/MSSearchEngine_TMDB.cpp \
 
 
-target_tmdb.files    = ./resources
-target_tmdb.path     = $$DESTDIR
-INSTALLS        += target_tmdb
+target_tmdb_lib.files    = ./resources/qjson/lib/libqjson.so
+target_tmdb_lib.path     = $$DESTDIR/lib
+target_tmdb_image.files    = ./resources/*.png
+target_tmdb_image.path     = $$DESTDIR/resources/
+INSTALLS        += target_tmdb_lib
+INSTALLS        += target_tmdb_image
 
 
 

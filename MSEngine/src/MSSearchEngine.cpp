@@ -27,28 +27,47 @@ namespace Tools
 
     void MSSearchEngineManager::loadAllSearchEngines()
     {
-        QDir pluginDir  = QDir( "/home/jguerinel/work/perso/m13moviesearch/build/debug/plugins" );
+        QDir pluginDir      = QDir( "./plugins" );
+        QDir libPluginDir   = QDir( "./plugins/lib" );
 
-        foreach( QString file, pluginDir.entryList( QDir::Files ) )
+        // Load plugins libs
+        QStringList lstrLibFileName = libPluginDir.entryList( QDir::Files );
+        qDebug() << "Trying to load " << lstrLibFileName.size() << " additionnal libs...";
+        foreach( QString strLibFileName, lstrLibFileName )
         {
-            qDebug() << "test " << pluginDir.absoluteFilePath( file );
-            QLibrary lib( "/home/jguerinel/work/perso/m13moviesearch/build/debug/plugins/resources/qjson/lib/libqjson.so" );
-            lib.load();
-            QPluginLoader loader( pluginDir.absoluteFilePath( file ) );
-            loader.setLoadHints(QLibrary::ResolveAllSymbolsHint);
-            QObject* pPlugin = loader.instance();
-
-            qDebug() << loader.errorString();
-            if( NULL != pPlugin )
+            qDebug() << "Trying to load " << strLibFileName;
+            QLibrary lib( libPluginDir.absoluteFilePath( strLibFileName ) );
+            bool bIsLoaded = lib.load();
+            if( bIsLoaded )
             {
-                qDebug() << "test";
-                MSSearchEngine* pSearchEngine = static_cast< MSSearchEngine* >( pPlugin );
-                s_lpSearchEngine.push_back( pSearchEngine );
-                qDebug() << pSearchEngine->getName();
+                qDebug() << strLibFileName << " has been successfully loaded.";
             }
             else
             {
-                qDebug() << "Failed to load a plugin!!!";
+                qDebug() << strLibFileName << " has not been loaded : " << lib.errorString();
+            }
+        }
+
+        // Load plugins
+        QStringList lstrPluginFileName = pluginDir.entryList( QDir::Files );
+        qDebug() << "Trying to load " << lstrPluginFileName.size() << " plugins...";
+        foreach( QString strPluginFileName, lstrPluginFileName )
+        {
+            qDebug() << "Trying to load " << strPluginFileName;
+
+            QPluginLoader loader( pluginDir.absoluteFilePath( strPluginFileName ) );
+            loader.setLoadHints(QLibrary::ResolveAllSymbolsHint);
+            QObject* pPlugin = loader.instance();
+
+            if( NULL != pPlugin )
+            {
+                MSSearchEngine* pSearchEngine = static_cast< MSSearchEngine* >( pPlugin );
+                s_lpSearchEngine.push_back( pSearchEngine );
+                qDebug() << pSearchEngine->getName() << " has been successfully loaded.";
+            }
+            else
+            {
+                qDebug() << strPluginFileName << " has not been loaded : " << loader.errorString();
             }
         }
     }
